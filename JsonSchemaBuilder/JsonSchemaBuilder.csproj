@@ -8,7 +8,7 @@
     <Company>DevelApp Denmark (CVR 33211740)</Company>
     <Copyright>Copyright © DevelApp 2020</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <RepositoryUrl>https://github.com/DevelApp-dk/Workflow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/DevelApp-dk/JsonSchemaBuilder</RepositoryUrl>
     <Description>Simple Json Schema builder for Manatee.Json to make it faster to combine in code</Description>
     <Version>1.0.8</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

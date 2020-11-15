@@ -30,7 +30,7 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Returns JsonSchemaPart
         /// </summary>
-        IJsonSchemaPart JsonSchemaPart { get; }
+        IJsonSchemaBuilderPart JsonSchemaPart { get; }
 
         /// <summary>
         /// Writes the schema to filePath

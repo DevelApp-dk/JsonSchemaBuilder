@@ -32,7 +32,7 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Returns JsonSchemaPart
         /// </summary>
-        public IJsonSchemaPart JsonSchemaPart { get; }
+        public IJsonSchemaBuilderPart JsonSchemaPart { get; }
 
         /// <summary>
         /// Name of the class without JsonSchema if existing
@@ -82,7 +82,11 @@ namespace DevelApp.JsonSchemaBuilder
         /// </summary>
         public abstract string Description { get; }
 
-        protected abstract IJsonSchemaPart BuildJsonSchema();
+        /// <summary>
+        /// Main function. Used to build JsonSchema from JsonSchemaParts
+        /// </summary>
+        /// <returns></returns>
+        protected abstract IJsonSchemaBuilderPart BuildJsonSchema();
 
         #endregion
 
@@ -107,20 +111,6 @@ namespace DevelApp.JsonSchemaBuilder
         #region JsonSchemaBuilder
         // Inspiration for types from https://github.com/lcahlander/xsd2json
 
-        private JsonSchema Factory(bool topHierarchy)
-        {
-            if (topHierarchy)
-            {
-                return new JsonSchema()
-                    .Id(Name)
-                    .Schema("http://json-schema.org/draft-07/schema#");
-            }
-            else
-            {
-                return new JsonSchema();
-            }
-        }
-
 
         /// <summary>
         /// Convenience schema definition. TopObject means this is the root of the schema. Expandable is used to define if schema can be inherited
@@ -137,38 +127,6 @@ namespace DevelApp.JsonSchemaBuilder
                 .Title(title)
                 .Description(description)
                 .AdditionalProperties(expandable);
-        }
-
-        /// <summary>
-        /// Convenience date definition in Json Schema in yyyy-MM-dd format (ISO-8601 compatible)
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <param name="topHierarchy">Is the top of hierarchy</param>
-        /// <returns></returns>
-        protected JsonSchema Date(string title, string description, bool topHierarchy = false)
-        {
-            return Factory(topHierarchy)
-                .Type(JsonSchemaType.String)
-                .Title(title)
-                .Description(description)
-                .Format(DateFormatValidator.Instance);
-        }
-
-        /// <summary>
-        /// Convenience datetime definition in Json Schema against several formats (ISO-8601 compatible)
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <param name="topHierarchy">Is the top of hierarchy</param>
-        /// <returns></returns>
-        protected JsonSchema DateTime(string title, string description, bool topHierarchy = false)
-        {
-            return Factory(topHierarchy)
-                .Type(JsonSchemaType.String)
-                .Title(title)
-                .Description(description)
-                .Format(DateTimeFormatValidator.Instance);
         }
 
         /// <summary>
@@ -201,20 +159,6 @@ namespace DevelApp.JsonSchemaBuilder
                 .Description(description);
         }
 
-        /// <summary>
-        /// Convenience array definition in Json Schema. Requires Items definition.
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <param name="topHierarchy">Is the top of hierarchy</param>
-        /// <returns></returns>
-        protected JsonSchema Array(string title, string description, bool topHierarchy = false)
-        {
-            return Factory(topHierarchy)
-                .Type(JsonSchemaType.Array)
-                .Title(title)
-                .Description(description);
-        }
 
         /// <summary>
         /// Convenience number definition in Json Schema.
@@ -228,20 +172,6 @@ namespace DevelApp.JsonSchemaBuilder
                 .Type(JsonSchemaType.Number)
                 .Title(title)
                 .Description(description);
-        }
-
-        /// <summary>
-        /// Convenience bool definition in Json Schema. Default value is false if not provided
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <returns></returns>
-        protected JsonSchema Boolean(string title, string description, bool topHierarchy = false)
-        {
-            return Factory(topHierarchy)
-                    .Type(JsonSchemaType.Boolean)
-                    .Title(title)
-                    .Description(description);
         }
 
         /// <summary>

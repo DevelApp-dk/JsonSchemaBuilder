@@ -3,6 +3,22 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyName>DevelApp.JsonSchemaBuilderCLI</AssemblyName>
+    <RootNamespace>DevelApp.JsonSchemaBuilderCLI</RootNamespace>
+    <Authors>Lars Shakya Buch-Jepsen</Authors>
+    <Company>DevelApp Denmark (CVR 33211740)</Company>
+    <Description>Code generator for DevelApp.JsonSchemaBuilder</Description>
+    <Copyright>Copyright © DevelApp 2020</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/DevelApp-dk/JsonSchemaBuilder</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

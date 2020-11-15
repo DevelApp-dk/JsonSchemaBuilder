@@ -4,9 +4,7 @@ using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public enum Part
+    class JsonSchemaBuilderNumber
     {
-        Object = 1,
-        String = 2
     }
 }
