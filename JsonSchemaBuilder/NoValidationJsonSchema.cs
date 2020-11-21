@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Manatee.Json;
+using Manatee.Json.Schema;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,9 +8,8 @@ namespace DevelApp.JsonSchemaBuilder
 {
     public class NoValidationJsonSchema : AbstractJsonSchema
     {
-        public NoValidationJsonSchema()
+        public NoValidationJsonSchema():base(jsonSchema: JsonSchema.Empty)
         {
-            JsonSchema = Manatee.Json.Schema.JsonSchema.Empty;
         }
 
         public override string Description
@@ -25,6 +26,11 @@ namespace DevelApp.JsonSchemaBuilder
             {
                 return "Default";
             }
+        }
+
+        protected override IJsonSchemaBuilderPart BuildJsonSchema()
+        {
+            throw new NotImplementedException($"BuildJsonSchema should not be called as JsonSchema has been provided");
         }
     }
 }

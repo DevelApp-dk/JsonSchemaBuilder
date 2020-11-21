@@ -14,9 +14,25 @@ namespace DevelApp.JsonSchemaBuilder
     {
         #region Implemented Parts
 
-        public AbstractJsonSchema()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jsonSchema"></param>
+        /// <param name="jsonValue"></param>
+        public AbstractJsonSchema(JsonSchema jsonSchema = null, JsonValue jsonValue = null)
         {
-            JsonSchemaPart = BuildJsonSchema();
+            if (jsonSchema != null)
+            {
+                JsonSchemaPart = BuildJsonSchema(jsonSchema);
+            }
+            else if (jsonValue != null)
+            {
+                JsonSchemaPart = BuildJsonSchema(jsonValue);
+            }
+            else
+            {
+                JsonSchemaPart = BuildJsonSchema();
+            }
         }
 
         /// <summary>
@@ -83,7 +99,28 @@ namespace DevelApp.JsonSchemaBuilder
         public abstract string Description { get; }
 
         /// <summary>
+        /// Main function. Used to build JsonSchema from JsonSchema
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IJsonSchemaBuilderPart BuildJsonSchema(JsonSchema jsonSchema)
+        {
+            JsonSerializer jsonSerializer = new JsonSerializer();
+            JsonValue serializedSchema = jsonSerializer.Serialize(jsonSchema);
+            return BuildJsonSchema(serializedSchema);
+        }
+
+        /// <summary>
         /// Main function. Used to build JsonSchema from JsonSchemaParts
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IJsonSchemaBuilderPart BuildJsonSchema(JsonValue jsonValue)
+        {
+            //TODO Do something
+        }
+
+        /// <summary>
+        /// Main function. Used to build JsonSchema from JsonSchemaParts 
+        /// if JsonSchema or JsonValue is not supplied to constructor
         /// </summary>
         /// <returns></returns>
         protected abstract IJsonSchemaBuilderPart BuildJsonSchema();
