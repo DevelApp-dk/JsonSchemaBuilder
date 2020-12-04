@@ -1,5 +1,7 @@
 using DevelApp.JsonSchemaBuilder;
 using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -11,13 +13,27 @@ namespace JsonSchemaBuilder.Test
         [Fact]
         public void BuildObject()
         {
-            List<IJsonSchemaBuilderPart> properties = new List<IJsonSchemaBuilderPart>();
+            Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
             string objectName = "ObjectName";
             string description = "ObjectDescription";
             bool isRequired = false;
             bool isExpandable = false;
 
             var varObject = new JsonSchemaBuilderObject(objectName, description, properties, isRequired, isExpandable);
+            JsonSchema varSchema = varObject.AsJsonSchema();
+        }
+
+        [Fact]
+        public void BuildBoolean()
+        {
+            string objectName = "BooleanName";
+            string description = "BooleanDescription";
+            bool? defaultValue = true;
+            bool isRequired = false;
+
+            var varBoolean = new JsonSchemaBuilderBoolean(objectName, description, defaultValue, isRequired);
+
+            JsonSchema varSchema = varBoolean.AsJsonSchema();
         }
 
         [Fact]
@@ -29,7 +45,15 @@ namespace JsonSchemaBuilder.Test
         [Fact]
         public void BuildString()
         {
+            string objectName = "StringName";
+            string description = "StringDescription";
+            string defaultValue = "default";
+            bool isRequired = false;
 
+            var varString = new JsonSchemaBuilderString(objectName, description, , defaultValue, isRequired);
+
+            JsonSchema varSchema = varString.AsJsonSchema();
+            
         }
 
         [Fact]
