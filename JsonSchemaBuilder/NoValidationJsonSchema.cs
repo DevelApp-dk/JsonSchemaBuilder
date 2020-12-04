@@ -1,4 +1,5 @@
-﻿using Manatee.Json;
+﻿using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+using Manatee.Json;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace DevelApp.JsonSchemaBuilder
             }
         }
 
-        protected override IJsonSchemaBuilderPart BuildJsonSchema()
+        protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
             throw new NotImplementedException($"BuildJsonSchema should not be called as JsonSchema has been provided");
         }

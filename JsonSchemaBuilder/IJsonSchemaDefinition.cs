@@ -1,4 +1,5 @@
-﻿using Manatee.Json.Schema;
+﻿using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,9 +29,9 @@ namespace DevelApp.JsonSchemaBuilder
         JsonSchema JsonSchema { get; }
 
         /// <summary>
-        /// Returns JsonSchemaPart
+        /// Returns JsonSchemaBuilderSchema
         /// </summary>
-        IJsonSchemaBuilderPart JsonSchemaPart { get; }
+        JsonSchemaBuilderSchema JsonSchemaBuilderSchema { get; }
 
         /// <summary>
         /// Writes the schema to filePath
