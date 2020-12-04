@@ -147,15 +147,5 @@ namespace DevelApp.JsonSchemaBuilder
                 return ".schema.json";
             }
         }
-
-
-        #region JsonSchemaBuilder
-        // Inspiration for types from https://github.com/lcahlander/xsd2json
-
-
-
-
-
-        #endregion
     }
 }

@@ -1,4 +1,6 @@
-﻿using Manatee.Json.Schema;
+﻿using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json;
+using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,21 +9,12 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
     public class JsonSchemaBuilderBoolean : AbstractJsonSchemaBuilderPart
     {
-        /// <summary>
-        /// Convenience bool definition in Json Schema. Default value is false if not provided
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <returns></returns>
-        protected JsonSchema Boolean(string title, string description, bool topHierarchy = false)
+        public JsonSchemaBuilderBoolean(IdentifierString boolName, string description, bool? defaultValue = null, bool isRequired = false) : base(boolName, description, isRequired)
         {
-            return Factory(topHierarchy)
-                    .Type(JsonSchemaType.Boolean)
-                    .Title(title)
-                    .Description(description);
+            DefaultValue = defaultValue;
         }
 
-
+        public bool? DefaultValue { get; }
 
         public override JsonSchemaBuilderPartType PartType
         {
@@ -33,7 +26,17 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            throw new NotImplementedException();
+            JsonSchema returnSchema = new JsonSchema()
+                .Type(JsonSchemaType.Boolean)
+                .Title(Name)
+                .Description(Description);
+
+            if(DefaultValue.HasValue)
+            {
+                returnSchema.Default(new JsonValue(DefaultValue.Value));
+            }
+
+            return returnSchema;
         }
     }
 }
