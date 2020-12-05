@@ -1,26 +1,33 @@
-﻿using Manatee.Json.Schema;
+﻿using DevelApp.JsonSchemaBuilder.Exceptions;
+using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
+    /// <summary>
+    /// Convenience array definition in Json Schema. Requires Items definition.
+    /// </summary>
     public class JsonSchemaBuilderArray : AbstractJsonSchemaBuilderPart
     {
-        /// <summary>
-        /// Convenience array definition in Json Schema. Requires Items definition.
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <param name="topHierarchy">Is the top of hierarchy</param>
-        /// <returns></returns>
-        protected JsonSchema Array(string title, string description, bool topHierarchy = false)
+        public JsonSchemaBuilderArray(IdentifierString arrayName, string description, List<IJsonSchemaBuilderPart> items,
+            uint? minItems = null, uint? maxItems = null, bool uniqueItems = false, bool isRequired = false) 
+            : base(arrayName, description, isRequired)
         {
-            return Factory(topHierarchy)
-                .Type(JsonSchemaType.Array)
-                .Title(title)
-                .Description(description);
+            Items = items;
+            MinItems = minItems;
+            MaxItems = maxItems;
+            UniqueItems = uniqueItems;
         }
+
+        public List<IJsonSchemaBuilderPart> Items { get; }
+
+        public uint? MinItems { get; }
+        public uint? MaxItems { get; }
+
+        public bool UniqueItems { get; }
 
         public override JsonSchemaBuilderPartType PartType
         {
@@ -32,7 +39,27 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            throw new NotImplementedException();
+            JsonSchema returnSchema = new JsonSchema()
+                .Type(JsonSchemaType.Array)
+                .Title(Name)
+                .Description(Description);
+            foreach(IJsonSchemaBuilderPart jsonSchemaBuilderPart in Items)
+            {
+                returnSchema.Items(jsonSchemaBuilderPart.AsJsonSchema());
+            }
+            if (MinItems.HasValue)
+            {
+                returnSchema.MinItems(MinItems.Value);
+            }
+            if (MaxItems.HasValue)
+            {
+                returnSchema.MaxItems(MaxItems.Value);
+            }
+            if(UniqueItems)
+            {
+                returnSchema.UniqueItems(UniqueItems);
+            }
+            return returnSchema;
         }
     }
 }

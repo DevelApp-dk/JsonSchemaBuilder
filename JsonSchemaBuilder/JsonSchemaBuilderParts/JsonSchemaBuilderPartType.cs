@@ -17,7 +17,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         Enum = 9,
         HexBinary = 10,
         Email = 11,
-        Reference = 12,
-        Schema = 13
+        UriReference = 12,
+        Schema = 13,
+        Time = 14
     }
 }

@@ -1,30 +1,30 @@
-﻿using Manatee.Json.Schema;
+﻿using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public class JsonSchemaBuilderHexBinary : AbstractJsonSchemaBuilderPart
+    /// <summary>
+    /// Convenience hexbinary definition in Json Schema.
+    /// </summary>
+    public class JsonSchemaBuilderHexBinary : JsonSchemaBuilderString
     {
-        /// <summary>
-        /// Convenience hexbinary definition in Json Schema.
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <param name="charSize"></param>
-        /// <returns></returns>
-        protected JsonSchema HexBinary(string title, string description, int charSize, bool topHierarchy = false)
+        public JsonSchemaBuilderHexBinary(
+                IdentifierString timeName,
+                string description,
+                uint? charSize = null,
+                bool isRequired = false)
+            : base(timeName,
+                description,
+                format: "hexbinary",
+                minLength: charSize.HasValue ? charSize.Value : 0,
+                maxLength: charSize,
+                pattern: "^([0-9a-fA-F]{2})*$",
+                isRequired: isRequired)
         {
-            return Factory(topHierarchy)
-                .Type(JsonSchemaType.String)
-                .Title(title)
-                .Description(description)
-                .MinLength((uint)charSize)
-                .MaxLength((uint)charSize)
-                .Pattern("^([0-9a-fA-F]{2})*$");
         }
-
 
         public override JsonSchemaBuilderPartType PartType
         {
@@ -32,11 +32,6 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             {
                 return JsonSchemaBuilderPartType.HexBinary;
             }
-        }
-
-        public override JsonSchema AsJsonSchema()
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DevelApp.JsonSchemaBuilder.Model;
+﻿using DevelApp.JsonSchemaBuilder.Exceptions;
+using DevelApp.JsonSchemaBuilder.Model;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,5 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         {
             return name.ToString().Substring(0, 1).ToLowerInvariant() + name.ToString().Substring(1);
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using Manatee.Json.Schema;
+﻿using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,20 +8,22 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
     public class JsonSchemaBuilderSchema : AbstractJsonSchemaBuilderPart
     {
-        private JsonSchema Factory(bool topHierarchy)
+        public JsonSchemaBuilderSchema(IdentifierString schemaName, string description, IJsonSchemaBuilderPart topPart, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, bool isRequired = false) : base(schemaName, description, isRequired)
         {
-            if (topHierarchy)
+            TopPart = topPart;
+            if (definitions != null)
             {
-                return new JsonSchema()
-                    .Id(Name)
-                    .Schema("http://json-schema.org/draft-07/schema#");
+                Definitions = definitions;
             }
             else
             {
-                return new JsonSchema();
+                Definitions = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
             }
         }
 
+        public Dictionary<IdentifierString, IJsonSchemaBuilderPart> Definitions { get; }
+
+        public IJsonSchemaBuilderPart TopPart { get; }
 
         public override JsonSchemaBuilderPartType PartType
         {
@@ -32,7 +35,14 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            throw new NotImplementedException();
+            JsonSchema returnSchema = TopPart.AsJsonSchema();
+            returnSchema.Id(Name);
+            returnSchema.Schema("http://json-schema.org/draft-07/schema#");
+            foreach(var pair in Definitions)
+            {
+                returnSchema.Definitions().Add(pair.Key, pair.Value.AsJsonSchema());
+            }
+            return returnSchema;
         }
     }
 }

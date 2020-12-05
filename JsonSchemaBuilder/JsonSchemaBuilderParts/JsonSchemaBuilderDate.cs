@@ -1,30 +1,29 @@
-﻿using Manatee.Json.Schema;
+﻿using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public class JsonSchemaBuilderDate : AbstractJsonSchemaBuilderPart
+    /// <summary>
+    /// Convenience date definition in Json Schema in yyyy-MM-dd format (ISO-8601 compatible)
+    /// </summary>
+    public class JsonSchemaBuilderDate : JsonSchemaBuilderString
     {
-        /// <summary>
-        /// Convenience date definition in Json Schema in yyyy-MM-dd format (ISO-8601 compatible)
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <param name="topHierarchy">Is the top of hierarchy</param>
-        /// <returns></returns>
-        protected JsonSchema Date(string title, string description, bool topHierarchy = false)
+        public JsonSchemaBuilderDate(
+            IdentifierString dateName,
+            string description,
+            DateTime? defaultValue = null,
+            bool isRequired = false)
+        : base(dateName,
+              description,
+              format: "date",
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              defaultValue: defaultValue.HasValue ? defaultValue.Value.Date.ToString("yyyy-MM-dd") : null,
+              isRequired: isRequired)
         {
-            return Factory(topHierarchy)
-                .Type(JsonSchemaType.String)
-                .Title(title)
-                .Description(description)
-                .Format(DateFormatValidator.Instance);
         }
-
-
-
 
         public override JsonSchemaBuilderPartType PartType
         {
@@ -32,11 +31,6 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             {
                 return JsonSchemaBuilderPartType.Date;
             }
-        }
-
-        public override JsonSchema AsJsonSchema()
-        {
-            throw new NotImplementedException();
         }
     }
 }
