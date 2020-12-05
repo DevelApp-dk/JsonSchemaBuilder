@@ -36,7 +36,7 @@ namespace DevelApp.JsonSchemaBuilder
             }
         }
 
-        private JsonSchema _jsonSchema;
+        protected JsonSchema _jsonSchema;
 
         /// <summary>
         /// Returns the complete Manatee JsonSchema

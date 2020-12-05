@@ -49,11 +49,13 @@ namespace JsonSchemaBuilder.Test
             string description = "StringDescription";
             string defaultValue = "default";
             bool isRequired = false;
+            uint minLength = 4;
+            uint maxLength = 8;
+            string pattern = "fau";
 
-            var varString = new JsonSchemaBuilderString(objectName, description, , defaultValue, isRequired);
+            var varString = new JsonSchemaBuilderString(objectName, description, minLength, maxLength, pattern, defaultValue, isRequired);
 
             JsonSchema varSchema = varString.AsJsonSchema();
-            
         }
 
         [Fact]

@@ -1,9 +1,11 @@
-﻿using DevelApp.JsonSchemaBuilder.Model;
+﻿using DevelApp.JsonSchemaBuilder.Exceptions;
+using DevelApp.JsonSchemaBuilder.Model;
 using Manatee.Json;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
@@ -14,6 +16,13 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             if(!string.IsNullOrWhiteSpace(defaultValue) && (defaultValue.Length < minLength || maxLength.HasValue && defaultValue.Length > maxLength.Value))
             {
                 throw new JsonSchemaBuilderException($"The default value ({defaultValue}) supplied is outside the minlength {minLength} and the maxlength {maxLength} defined");
+            }
+            if(!string.IsNullOrWhiteSpace(defaultValue) && !string.IsNullOrWhiteSpace(pattern))
+            {
+                if(!Regex.IsMatch(defaultValue, pattern))
+                {
+                    throw new JsonSchemaBuilderException($"The default value ({defaultValue}) supplied does not match the pattern ({pattern}) supplied");
+                }
             }
             DefaultValue = defaultValue;
             MinLength = minLength;
