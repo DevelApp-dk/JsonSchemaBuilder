@@ -19,7 +19,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             _tIsNullable = Nullable.GetUnderlyingType(type) != null;
             if (!(_tIsString || _tIsJsonValue || _tIsNullable))
             {
-                throw new JsonSchemaBuilderException($"Only allowed types are nullable or classes as direct use of value types gives errors");
+                throw new JsonSchemaBuilderException($"Only allowed types are nullable or classes string and JsonValue as direct use of value types gives errors");
             }
 
             Name = name;
@@ -109,10 +109,19 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             {
                 if (item is bool?)
                 {
-                    return new JsonValue(item as bool?);
+                    return new JsonValue((item as bool?).Value);
                 }
+                if (item is long?)
+                {
+                    return new JsonValue((item as long?).Value);
+                }
+                if (item is double?)
+                {
+                    return new JsonValue((item as double?).Value);
+                }
+                throw new JsonSchemaBuilderException($"The nullable used ({typeof(T).Name}) is not supported");
             }
-            throw new JsonSchemaBuilderException($"Should not get here");
+            throw new JsonSchemaBuilderException($"Should not get here as exception has been thrown in contructor");
         }
 
 
