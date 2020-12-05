@@ -1,5 +1,6 @@
 ﻿using DevelApp.JsonSchemaBuilder.Exceptions;
 using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience array definition in Json Schema. Requires Items definition.
     /// </summary>
-    public class JsonSchemaBuilderArray : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderArray : AbstractJsonSchemaBuilderPart<JsonValue>
     {
         public JsonSchemaBuilderArray(IdentifierString arrayName, string description, List<IJsonSchemaBuilderPart> items,
             uint? minItems = null, uint? maxItems = null, bool uniqueItems = false, bool isRequired = false) 
@@ -39,10 +40,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            JsonSchema returnSchema = new JsonSchema()
-                .Type(JsonSchemaType.Array)
-                .Title(Name)
-                .Description(Description);
+            JsonSchema returnSchema = InitialJsonSchema()
+                .Type(JsonSchemaType.Array);
             foreach(IJsonSchemaBuilderPart jsonSchemaBuilderPart in Items)
             {
                 returnSchema.Items(jsonSchemaBuilderPart.AsJsonSchema());

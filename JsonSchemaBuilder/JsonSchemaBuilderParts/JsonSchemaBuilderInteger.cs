@@ -10,39 +10,39 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience integer definition in Json Schema.
     /// </summary>
-    public class JsonSchemaBuilderInteger : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderInteger : AbstractJsonSchemaBuilderPart<long?>
     {
-        public JsonSchemaBuilderInteger(IdentifierString objectName, string description, long? minimum, long? maximum, double? multipleOf = null, long? defaultValue = null, bool isRequired = false) : base(objectName, description, isRequired)
+        public JsonSchemaBuilderInteger(IdentifierString objectName, string description, long? minimum, 
+            long? maximum, double? multipleOf = null, long? defaultValue = null, List<long?> examples = null, 
+            List<long?> enums = null, bool isRequired = false) 
+            : base(objectName, description, isRequired, defaultValue:defaultValue, examples:examples, enums:enums)
         {
-            if (minimum.HasValue && defaultValue.HasValue)
+            if (minimum.HasValue && DefaultValue.HasValue)
             {
-                if (defaultValue.Value < minimum.Value)
+                if (DefaultValue.Value < minimum.Value)
                 {
-                    throw new JsonSchemaBuilderException($"The default value ({defaultValue}) supplied is below the minimum ({minimum}) supplied");
+                    throw new JsonSchemaBuilderException($"The default value ({DefaultValue}) supplied is below the minimum ({minimum}) supplied");
                 }
             }
-            if (maximum.HasValue && defaultValue.HasValue)
+            if (maximum.HasValue && DefaultValue.HasValue)
             {
-                if (defaultValue.Value > maximum.Value)
+                if (DefaultValue.Value > maximum.Value)
                 {
-                    throw new JsonSchemaBuilderException($"The default value ({defaultValue}) supplied is above the maximum ({maximum}) supplied");
+                    throw new JsonSchemaBuilderException($"The default value ({DefaultValue}) supplied is above the maximum ({maximum}) supplied");
                 }
             }
-            if (multipleOf.HasValue && defaultValue.HasValue)
+            if (multipleOf.HasValue && DefaultValue.HasValue)
             {
-                if ((double)defaultValue.Value % multipleOf.Value != 0)
+                if (((double)DefaultValue.Value) % multipleOf.Value != 0)
                 {
-                    throw new JsonSchemaBuilderException($"The default value ({defaultValue}) supplied is not a multiple of multipleOf ({multipleOf}) supplied");
+                    throw new JsonSchemaBuilderException($"The default value ({DefaultValue}) supplied is not a multiple of multipleOf ({multipleOf}) supplied");
                 }
             }
 
-            DefaultValue = defaultValue;
             MultipleOf = multipleOf;
             Minimum = minimum;
             Maximum = maximum;
         }
-
-        public long? DefaultValue { get; }
 
         public double? MultipleOf { get; }
 
@@ -59,15 +59,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            JsonSchema returnSchema = new JsonSchema()
-                .Type(JsonSchemaType.Integer)
-                .Title(Name)
-                .Description(Description);
+            JsonSchema returnSchema = InitialJsonSchema()
+                .Type(JsonSchemaType.Integer);
 
-            if (DefaultValue.HasValue)
-            {
-                returnSchema.Default(new Manatee.Json.JsonValue(DefaultValue));
-            }
             if (MultipleOf.HasValue)
             {
                 returnSchema.MultipleOf(MultipleOf.Value);

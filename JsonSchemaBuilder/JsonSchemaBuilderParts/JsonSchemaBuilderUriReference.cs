@@ -9,9 +9,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Add reference "$ref": "./xs.schema.json#/definitions/xs:decimal" with "./xs.schema.json" as the local file and "#/definitions/xs:decimal" getting xs:decimal from the definition
     /// </summary>
-    public class JsonSchemaBuilderUriReference : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderUriReference : AbstractJsonSchemaBuilderPart<string>
     {
-        public JsonSchemaBuilderUriReference(IdentifierString referenceName, string description, string objectReference = null, string localFileLocation = null, bool isRequired = false) : base(referenceName, description, isRequired)
+        public JsonSchemaBuilderUriReference(IdentifierString referenceName, string description, string objectReference = null, 
+            string localFileLocation = null, bool isRequired = false) 
+            : base(referenceName, description, isRequired, defaultValue: "", examples, enums)
         {
             if(localFileLocation.EndsWith("#"))
             {
@@ -39,10 +41,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            JsonSchema returnSchema = new JsonSchema()
-                .Type(JsonSchemaType.String)
-                .Title(Name)
-                .Description(Description);
+            JsonSchema returnSchema = InitialJsonSchema()
+                .Type(JsonSchemaType.String);
             if (string.IsNullOrWhiteSpace(LocalFileLocation))
             {
                 returnSchema.Ref("#" + ObjectReference);

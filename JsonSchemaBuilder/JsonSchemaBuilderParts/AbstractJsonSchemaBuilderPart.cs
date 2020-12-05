@@ -1,5 +1,6 @@
 ﻿using DevelApp.JsonSchemaBuilder.Exceptions;
 using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -7,14 +8,46 @@ using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public abstract class AbstractJsonSchemaBuilderPart : IJsonSchemaBuilderPart
+    public abstract class AbstractJsonSchemaBuilderPart<T> : IJsonSchemaBuilderPart
     {
-        public AbstractJsonSchemaBuilderPart(IdentifierString name, string description, bool isRequired)
+        public AbstractJsonSchemaBuilderPart(IdentifierString name, string description, bool isRequired, 
+            T defaultValue, List<T> examples, List<T> enums)
         {
+            var type = typeof(T);
+            _tIsClass = type.IsClass;
+            _tIsNullable = Nullable.GetUnderlyingType(type) != null;
+            if (!(_tIsClass || _tIsNullable))
+            {
+                throw new JsonSchemaBuilderException($"Only allowed types are nullable or classes as direct use of value types gives errors");
+            }
+
             Name = name;
             Description = description;
             IsRequired = isRequired;
+            if (!Equals(defaultValue, default(T)));
+            {
+                DefaultValue = defaultValue;
+            }
+            if (examples == null)
+            {
+                Examples = new List<T>();
+            }
+            else
+            {
+                Examples = examples;
+            }
+            if (enums == null)
+            {
+                Enums = new List<T>();
+            }
+            else
+            {
+                Enums = enums;
+            }
         }
+
+        private bool _tIsClass;
+        private bool _tIsNullable;
 
         public IdentifierString Name { get; }
 
@@ -22,10 +55,57 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public bool IsRequired { get; }
 
+        public T DefaultValue { get; }
+
+        public List<T> Examples { get; }
+
+        public List<T> Enums { get; }
 
         public abstract JsonSchemaBuilderPartType PartType { get; }
 
         public abstract JsonSchema AsJsonSchema();
+
+        protected JsonSchema InitialJsonSchema()
+        {
+            JsonSchema returnSchema = new JsonSchema()
+                .Title(Name)
+                .Description(Description)
+                .Comment($"Generated with JsonSchemaBuilder");
+            if (Examples != null)
+            {
+                List<JsonValue> examplesOut = new List<JsonValue>();
+                foreach (T item in Examples)
+                {
+                    examplesOut.Add(TAsJsonValue(item));
+                }
+                returnSchema.Examples(examplesOut.ToArray());
+            }
+            if (Enums != null)
+            {
+                List<JsonValue> enumsOut = new List<JsonValue>();
+                foreach (T item in Enums)
+                {
+                    enumsOut.Add(TAsJsonValue(item));
+                }
+                returnSchema.Enum(enumsOut.ToArray());
+            }
+
+            return returnSchema;
+        }
+
+        private JsonValue TAsJsonValue(T item)
+        {
+            if(_tIsClass)
+            {
+
+            }
+            else if (_tIsNullable)
+            {
+                Type nulledType = Nullable.GetUnderlyingType(typeof(T));
+
+            }
+        }
+
 
         /// <summary>
         /// Returns a identifier with small letter as start

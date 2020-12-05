@@ -7,14 +7,14 @@ using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public class JsonSchemaBuilderBoolean : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderBoolean : AbstractJsonSchemaBuilderPart<bool?>
     {
-        public JsonSchemaBuilderBoolean(IdentifierString boolName, string description, bool? defaultValue = null, bool isRequired = false) : base(boolName, description, isRequired)
+        public JsonSchemaBuilderBoolean(IdentifierString boolName, string description, 
+            bool? defaultValue = null, bool isRequired = false) : 
+            base(boolName, description, isRequired, defaultValue: defaultValue, examples: null, enums: null)
         {
-            DefaultValue = defaultValue;
         }
 
-        public bool? DefaultValue { get; }
 
         public override JsonSchemaBuilderPartType PartType
         {
@@ -26,15 +26,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            JsonSchema returnSchema = new JsonSchema()
-                .Type(JsonSchemaType.Boolean)
-                .Title(Name)
-                .Description(Description);
-
-            if(DefaultValue.HasValue)
-            {
-                returnSchema.Default(new JsonValue(DefaultValue.Value));
-            }
+            JsonSchema returnSchema = InitialJsonSchema()
+                .Type(JsonSchemaType.Boolean);
 
             return returnSchema;
         }

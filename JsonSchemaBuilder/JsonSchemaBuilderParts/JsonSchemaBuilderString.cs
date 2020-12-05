@@ -12,22 +12,23 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Ordinary string and parent to all string format types ref http://json-schema.org/understanding-json-schema/reference/string.html
     /// </summary>
-    public class JsonSchemaBuilderString : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderString : AbstractJsonSchemaBuilderPart<string>
     {
-        public JsonSchemaBuilderString(IdentifierString stringName, string description, string format = null, uint minLength = 0, uint? maxLength = null, string pattern = null, string defaultValue = null, bool isRequired = false) : base(stringName, description, isRequired)
+        public JsonSchemaBuilderString(IdentifierString stringName, string description, string format = null, uint minLength = 0, 
+            uint? maxLength = null, string pattern = null, string defaultValue = null, bool isRequired = false) 
+            : base(stringName, description, isRequired, defaultValue, examples, enums)
         {
-            if(!string.IsNullOrWhiteSpace(defaultValue) && (defaultValue.Length < minLength || maxLength.HasValue && defaultValue.Length > maxLength.Value))
+            if(!string.IsNullOrWhiteSpace(DefaultValue) && (DefaultValue.Length < minLength || maxLength.HasValue && DefaultValue.Length > maxLength.Value))
             {
-                throw new JsonSchemaBuilderException($"The default value ({defaultValue}) supplied in {PartType} is outside the minlength {minLength} and the maxlength {maxLength} defined");
+                throw new JsonSchemaBuilderException($"The default value ({DefaultValue}) supplied in {PartType} is outside the minlength {minLength} and the maxlength {maxLength} defined");
             }
-            if(!string.IsNullOrWhiteSpace(defaultValue) && !string.IsNullOrWhiteSpace(pattern))
+            if(!string.IsNullOrWhiteSpace(DefaultValue) && !string.IsNullOrWhiteSpace(pattern))
             {
-                if(!Regex.IsMatch(defaultValue, pattern))
+                if(!Regex.IsMatch(DefaultValue, pattern))
                 {
-                    throw new JsonSchemaBuilderException($"The default value ({defaultValue}) supplied in JsonSchemaBuilder{PartType} does not match the pattern ({pattern}) supplied");
+                    throw new JsonSchemaBuilderException($"The default value ({DefaultValue}) supplied in JsonSchemaBuilder{PartType} does not match the pattern ({pattern}) supplied");
                 }
             }
-            DefaultValue = defaultValue;
             MinLength = minLength;
             MaxLength = maxLength;
             Pattern = pattern;
@@ -37,8 +38,6 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         public uint MinLength { get; }
         public uint? MaxLength { get; }
         public string Pattern { get; }
-
-        public string DefaultValue { get; }
 
         public string Format { get; }
 
@@ -52,19 +51,12 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            JsonSchema returnSchema = new JsonSchema()
-                .Type(JsonSchemaType.String)
-                .Title(Name)
-                .Description(Description);
+            JsonSchema returnSchema = InitialJsonSchema()
+                .Type(JsonSchemaType.String);
 
             if (string.IsNullOrWhiteSpace(Format))
             {
                 returnSchema.Format(Format);
-            }
-
-            if (string.IsNullOrWhiteSpace(DefaultValue))
-            {
-                returnSchema.Default(new JsonValue(DefaultValue));
             }
 
             if (MinLength > 0)

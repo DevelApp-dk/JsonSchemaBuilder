@@ -10,9 +10,12 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience number definition in Json Schema.
     /// </summary>
-    public class JsonSchemaBuilderNumber : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderNumber : AbstractJsonSchemaBuilderPart<double?>
     {
-        public JsonSchemaBuilderNumber(IdentifierString objectName, string description, double? minimum, double? maximum, double? multipleOf = null, double? defaultValue = null, bool isRequired = false) : base(objectName, description, isRequired)
+        public JsonSchemaBuilderNumber(IdentifierString objectName, string description, double? minimum, double? maximum, 
+            double? multipleOf = null, double? defaultValue = null, List<double?> examples = null,
+            List<double?> enums = null, bool isRequired = false)
+            : base(objectName, description, isRequired, defaultValue: defaultValue, examples: examples, enums: enums)
         {
             if (minimum.HasValue && defaultValue.HasValue)
             {
@@ -36,13 +39,10 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
                 }
             }
 
-            DefaultValue = defaultValue;
             MultipleOf = multipleOf;
             Minimum = minimum;
             Maximum = maximum;
         }
-
-        public double? DefaultValue { get; }
 
         public double? MultipleOf { get; }
 
@@ -59,15 +59,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            JsonSchema returnSchema = new JsonSchema()
-                .Type(JsonSchemaType.Number)
-                .Title(Name)
-                .Description(Description);
+            JsonSchema returnSchema = InitialJsonSchema()
+                .Type(JsonSchemaType.Number);
 
-            if (DefaultValue.HasValue)
-            {
-                returnSchema.Default(new Manatee.Json.JsonValue(DefaultValue));
-            }
             if (MultipleOf.HasValue)
             {
                 returnSchema.MultipleOf(MultipleOf.Value);

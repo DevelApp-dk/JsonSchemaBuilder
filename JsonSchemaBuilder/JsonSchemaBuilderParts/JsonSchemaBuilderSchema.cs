@@ -1,4 +1,5 @@
 ﻿using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -6,9 +7,12 @@ using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public class JsonSchemaBuilderSchema : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderSchema : AbstractJsonSchemaBuilderPart<JsonValue>
     {
-        public JsonSchemaBuilderSchema(IdentifierString schemaName, string description, IJsonSchemaBuilderPart topPart, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, bool isRequired = false) : base(schemaName, description, isRequired)
+        public JsonSchemaBuilderSchema(IdentifierString schemaName, string description, 
+            IJsonSchemaBuilderPart topPart, 
+            Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, bool isRequired = false) 
+            : base(schemaName, description, isRequired)
         {
             TopPart = topPart;
             if (definitions != null)

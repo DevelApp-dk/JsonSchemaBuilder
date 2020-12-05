@@ -1,4 +1,5 @@
 ﻿using DevelApp.JsonSchemaBuilder.Model;
+using Manatee.Json;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,12 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Defines JsonSchema object
     /// </summary>
-    public class JsonSchemaBuilderObject : AbstractJsonSchemaBuilderPart
+    public class JsonSchemaBuilderObject : AbstractJsonSchemaBuilderPart<JsonValue>
     {
-        public JsonSchemaBuilderObject(IdentifierString objectName, string description, Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = null, bool isRequired = false, bool isExpandable = false) : base(objectName, description, isRequired)
+        public JsonSchemaBuilderObject(IdentifierString objectName, string description, 
+            Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = null, bool isRequired = false, 
+            bool isExpandable = false)
+            : base(objectName, description, isRequired, defaultValue: defaultValue, examples: examples, enums: enums)
         {
             if (properties != null)
             {
@@ -44,10 +48,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public override JsonSchema AsJsonSchema()
         {
-            JsonSchema returnSchema = new JsonSchema()
+            JsonSchema returnSchema = InitialJsonSchema()
                 .Type(JsonSchemaType.Object)
-                .Title(Name)
-                .Description(Description)
                 .AdditionalProperties(IsExpandable);
             //Add properties
             foreach (IJsonSchemaBuilderPart property in Properties.Values)
