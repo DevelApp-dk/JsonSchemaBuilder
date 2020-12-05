@@ -12,8 +12,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     public class JsonSchemaBuilderUriReference : AbstractJsonSchemaBuilderPart<string>
     {
         public JsonSchemaBuilderUriReference(IdentifierString referenceName, string description, string objectReference = null, 
-            string localFileLocation = null, bool isRequired = false) 
-            : base(referenceName, description, isRequired, defaultValue: "", examples, enums)
+            string localFileLocation = null, string defaultValue = null, List<string> examples = null, List<string> enums = null, bool isRequired = false) 
+            : base(referenceName, description, isRequired, defaultValue, examples, enums)
         {
             if(localFileLocation.EndsWith("#"))
             {

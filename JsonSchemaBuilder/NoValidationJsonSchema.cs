@@ -33,5 +33,10 @@ namespace DevelApp.JsonSchemaBuilder
         {
             throw new NotImplementedException($"BuildJsonSchema should not be called as JsonSchema has been provided");
         }
+
+        protected override JsonSchemaBuilderSchema BuildJsonSchema(JsonSchema jsonSchema)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

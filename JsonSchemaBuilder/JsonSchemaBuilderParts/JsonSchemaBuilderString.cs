@@ -15,7 +15,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     public class JsonSchemaBuilderString : AbstractJsonSchemaBuilderPart<string>
     {
         public JsonSchemaBuilderString(IdentifierString stringName, string description, string format = null, uint minLength = 0, 
-            uint? maxLength = null, string pattern = null, string defaultValue = null, bool isRequired = false) 
+            uint? maxLength = null, string pattern = null, string defaultValue = null, List<string> examples = null, List<string> enums = null, bool isRequired = false) 
             : base(stringName, description, isRequired, defaultValue, examples, enums)
         {
             if(!string.IsNullOrWhiteSpace(DefaultValue) && (DefaultValue.Length < minLength || maxLength.HasValue && DefaultValue.Length > maxLength.Value))

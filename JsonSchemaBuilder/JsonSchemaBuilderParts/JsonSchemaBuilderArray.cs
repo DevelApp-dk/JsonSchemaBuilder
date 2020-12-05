@@ -14,8 +14,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     public class JsonSchemaBuilderArray : AbstractJsonSchemaBuilderPart<JsonValue>
     {
         public JsonSchemaBuilderArray(IdentifierString arrayName, string description, List<IJsonSchemaBuilderPart> items,
-            uint? minItems = null, uint? maxItems = null, bool uniqueItems = false, bool isRequired = false) 
-            : base(arrayName, description, isRequired)
+            uint? minItems = null, uint? maxItems = null, bool uniqueItems = false, JsonValue defaultValue = null, List<JsonValue> examples = null, List<JsonValue> enums = null, bool isRequired = false) 
+            : base(arrayName, description, isRequired, defaultValue, examples, enums)
         {
             Items = items;
             MinItems = minItems;

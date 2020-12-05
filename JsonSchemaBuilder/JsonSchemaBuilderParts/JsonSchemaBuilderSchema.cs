@@ -11,8 +11,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     {
         public JsonSchemaBuilderSchema(IdentifierString schemaName, string description, 
             IJsonSchemaBuilderPart topPart, 
-            Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, bool isRequired = false) 
-            : base(schemaName, description, isRequired)
+            Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, JsonValue defaultValue = null,
+            List<JsonValue> examples = null, List<JsonValue> enums = null, bool isRequired = false) 
+            : base(schemaName, description, isRequired, defaultValue, examples, enums)
         {
             TopPart = topPart;
             if (definitions != null)

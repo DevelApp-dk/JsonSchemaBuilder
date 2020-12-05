@@ -14,7 +14,6 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         Array = 6,
         Number = 7,
         Boolean = 8,
-        Enum = 9,
         HexBinary = 10,
         Email = 11,
         UriReference = 12,

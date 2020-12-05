@@ -14,7 +14,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     {
         public JsonSchemaBuilderObject(IdentifierString objectName, string description, 
             Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = null, bool isRequired = false, 
-            bool isExpandable = false)
+            JsonValue defaultValue = null, List<JsonValue> examples = null, List<JsonValue> enums = null, bool isExpandable = false)
             : base(objectName, description, isRequired, defaultValue: defaultValue, examples: examples, enums: enums)
         {
             if (properties != null)

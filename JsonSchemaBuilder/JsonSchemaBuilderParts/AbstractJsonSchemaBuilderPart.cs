@@ -14,9 +14,10 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             T defaultValue, List<T> examples, List<T> enums)
         {
             var type = typeof(T);
-            _tIsClass = type.IsClass;
+            _tIsString = type.Name.Equals("string");
+            _tIsJsonValue = type.Name.Equals("JsonValue");
             _tIsNullable = Nullable.GetUnderlyingType(type) != null;
-            if (!(_tIsClass || _tIsNullable))
+            if (!(_tIsString || _tIsJsonValue || _tIsNullable))
             {
                 throw new JsonSchemaBuilderException($"Only allowed types are nullable or classes as direct use of value types gives errors");
             }
@@ -24,7 +25,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             Name = name;
             Description = description;
             IsRequired = isRequired;
-            if (!Equals(defaultValue, default(T)));
+            if (!Equals(defaultValue, default(T)))
             {
                 DefaultValue = defaultValue;
             }
@@ -46,7 +47,8 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             }
         }
 
-        private bool _tIsClass;
+        private bool _tIsString;
+        private bool _tIsJsonValue;
         private bool _tIsNullable;
 
         public IdentifierString Name { get; }
@@ -95,15 +97,22 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         private JsonValue TAsJsonValue(T item)
         {
-            if(_tIsClass)
+            if (_tIsJsonValue)
             {
-
+                return item as JsonValue;
+            }
+            else if (_tIsString)
+            {
+                return item as string;
             }
             else if (_tIsNullable)
             {
-                Type nulledType = Nullable.GetUnderlyingType(typeof(T));
-
+                if (item is bool?)
+                {
+                    return new JsonValue(item as bool?);
+                }
             }
+            throw new JsonSchemaBuilderException($"Should not get here");
         }
 
 
