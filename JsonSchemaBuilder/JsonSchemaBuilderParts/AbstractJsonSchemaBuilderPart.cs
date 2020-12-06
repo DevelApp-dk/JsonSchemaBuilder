@@ -14,7 +14,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             T defaultValue, List<T> examples, List<T> enums)
         {
             var type = typeof(T);
-            _tIsString = type.Name.Equals("string");
+            _tIsString = type.Name.Equals("String");
             _tIsJsonValue = type.Name.Equals("JsonValue");
             _tIsNullable = Nullable.GetUnderlyingType(type) != null;
             if (!(_tIsString || _tIsJsonValue || _tIsNullable))

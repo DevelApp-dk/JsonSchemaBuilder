@@ -19,7 +19,7 @@ namespace JsonSchemaBuilder.Test
             bool isRequired = false;
             bool isExpandable = false;
 
-            var varObject = new JsonSchemaBuilderObject(objectName, description, properties, isRequired, isExpandable);
+            var varObject = new JsonSchemaBuilderObject(objectName, description, properties, isRequired: isRequired, isExpandable: isExpandable);
             JsonSchema varSchema = varObject.AsJsonSchema();
         }
 
@@ -53,7 +53,8 @@ namespace JsonSchemaBuilder.Test
             uint maxLength = 8;
             string pattern = "fau";
 
-            var varString = new JsonSchemaBuilderString(objectName, description, minLength, maxLength, pattern, defaultValue, isRequired);
+            var varString = new JsonSchemaBuilderString(objectName, description, minLength:minLength, 
+                maxLength:maxLength, pattern: pattern, defaultValue: defaultValue, isRequired: isRequired);
 
             JsonSchema varSchema = varString.AsJsonSchema();
         }
