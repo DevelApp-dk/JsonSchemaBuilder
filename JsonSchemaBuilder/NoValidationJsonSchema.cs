@@ -9,7 +9,7 @@ namespace DevelApp.JsonSchemaBuilder
 {
     public class NoValidationJsonSchema : AbstractJsonSchema
     {
-        public NoValidationJsonSchema():base(jsonSchema: JsonSchema.Empty)
+        public NoValidationJsonSchema()
         {
         }
 
@@ -31,12 +31,7 @@ namespace DevelApp.JsonSchemaBuilder
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            throw new NotImplementedException($"BuildJsonSchema should not be called as JsonSchema has been provided");
-        }
-
-        protected override JsonSchemaBuilderSchema BuildJsonSchema(JsonSchema jsonSchema)
-        {
-            throw new NotImplementedException();
+            return new JsonSchemaBuilderSchema(GetType().Name.Replace("JsonSchema",""), Description);
         }
     }
 }

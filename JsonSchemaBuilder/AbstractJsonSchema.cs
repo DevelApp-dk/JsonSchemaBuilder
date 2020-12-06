@@ -109,7 +109,10 @@ namespace DevelApp.JsonSchemaBuilder
         /// Main function. Used to build JsonSchemaBuilder from JsonSchema
         /// </summary>
         /// <returns></returns>
-        protected abstract JsonSchemaBuilderSchema BuildJsonSchema(JsonSchema jsonSchema);
+        protected JsonSchemaBuilderSchema BuildJsonSchema(JsonSchema jsonSchema)
+        {
+            return JsonSchemaBuilderSchema.BuildSchema(jsonSchema);
+        }
 
         /// <summary>
         /// Main function. Used to build JsonSchema from JsonSchemaParts
