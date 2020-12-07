@@ -9,21 +9,35 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 {
     public class GenerateCode
     {
-        public (string fileName, string code) Generate(Code code, JsonSchemaBuilderSchema schema)
+        /// <summary>
+        /// Generate code to memory and suggest a filename
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="schema"></param>
+        /// <returns></returns>
+        public (string fileName, string code) Generate(Code code, IJsonSchemaDefinition schema)
         {
+            string fileName = Path.Combine(schema.Module.ToFilePath, schema.Name);
+
             switch (code)
             {
                 case Code.CSharp:
-                    return CSharp.GenerateCode(schema);
+                    return CSharp.GenerateCode(fileName, schema);
                 default:
                     throw new CodeGenerationException($"Code generation of {code} is not supported");
             }
         }
 
-        public void Generate(Code code, JsonSchemaBuilderSchema schema, string folderLocation)
+        /// <summary>
+        /// Generate code to a path
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="schema"></param>
+        /// <param name="filePathBeforeNamespace"></param>
+        public void Generate(Code code, IJsonSchemaDefinition schema, string filePathBeforeNamespace)
         {
             var tuple = Generate(code, schema);
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderLocation, tuple.fileName)))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(filePathBeforeNamespace, tuple.fileName)))
             {
                 outputFile.Write(tuple.code);
                 outputFile.Flush();

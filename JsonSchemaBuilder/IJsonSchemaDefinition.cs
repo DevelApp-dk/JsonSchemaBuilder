@@ -1,4 +1,6 @@
-﻿using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+﻿using DevelApp.JsonSchemaBuilder.CodeGeneration;
+using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+using DevelApp.JsonSchemaBuilder.Model;
 using Manatee.Json.Schema;
 using System;
 using System.Collections.Generic;
@@ -11,12 +13,12 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Returns the name of the schema
         /// </summary>
-        string Name { get; }
+        IdentifierString Name { get; }
 
         /// <summary>
-        /// Returns the module of the schema
+        /// Returns the module of the schema. This works as a namespace with dot separating namespace and subnamespace
         /// </summary>
-        string Module { get; }
+        NamespaceString Module { get; }
 
         /// <summary>
         /// The description of the schema
@@ -36,7 +38,21 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Writes the schema to filePath
         /// </summary>
-        /// <param name="filePath"></param>
-        void WriteSchemaToFile(string filePath);
+        /// <param name="filePathBeforeModuleNamespace"></param>
+        void WriteSchemaToFile(string filePathBeforeModuleNamespace);
+
+        /// <summary>
+        /// Generate code to memory and suggest a filename
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        (string fileName, string code) GenerateCode(Code code);
+
+        /// <summary>
+        /// Generate code to a path
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="filePathBeforeModuleNamespace"></param>
+        void GenerateCode(Code code, string filePathBeforeModuleNamespace);
     }
 }

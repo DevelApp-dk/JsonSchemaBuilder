@@ -5,6 +5,8 @@ using Manatee.Json.Schema;
 using Manatee.Json.Serialization;
 using System.IO;
 using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+using DevelApp.JsonSchemaBuilder.Model;
+using DevelApp.JsonSchemaBuilder.CodeGeneration;
 
 namespace DevelApp.JsonSchemaBuilder
 {
@@ -60,35 +62,66 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Name of the class without JsonSchema if existing
         /// </summary>
-        public string Name
+        public IdentifierString Name
         {
             get
             {
-                string name = GetType().Name;
-                string nameWithoutJsonSchema = name.Replace("JsonSchema", "");
-
-                return $"{Module}.{nameWithoutJsonSchema}";
+                return GetType().Name.Replace("JsonSchema", "");
             }
         }
 
         /// <summary>
         /// Write schema to file
         /// </summary>
-        /// <param name="filePath"></param>
-        public void WriteSchemaToFile(string filePath)
+        /// <param name="filePathBeforeNamespace"></param>
+        public void WriteSchemaToFile(string filePathBeforeNamespace)
         {
             var serializer = new JsonSerializer();
             if (JsonSchema != null)
             {
                 var schemaInJson = JsonSchema.ToJson(serializer);
-                string fileName = $"{TransformToCorrectCase(Module)}.{TransformToCorrectCase(Name)}{FileEnding}";
+                string fileName = Path.Combine(Module.ToFilePath,TransformToCorrectCase(Name) + FILE_ENDING);
 
-                File.WriteAllText(Path.Combine(filePath, fileName), schemaInJson.GetIndentedString());
+                File.WriteAllText(Path.Combine(filePathBeforeNamespace, fileName), schemaInJson.GetIndentedString());
             }
             else
             {
                 throw new Exception("WriteSchemaToFile called before JsonSchema has been set");
             }
+        }
+
+        private GenerateCode _generateCode;
+
+        private GenerateCode CodeGeneration
+        {
+            get
+            {
+                if(_generateCode == null)
+                {
+                    _generateCode = new GenerateCode();
+                }
+                return _generateCode;
+            }
+        }
+
+        /// <summary>
+        /// Generate code to memory and suggest a filename
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public (string fileName, string code) GenerateCode(Code code)
+        {
+            return CodeGeneration.Generate(code, this);
+        }
+
+        /// <summary>
+        /// Generate code to a path
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="filePathBeforeModuleNamespace"></param>
+        public void GenerateCode(Code code, string filePathBeforeModuleNamespace)
+        {
+            CodeGeneration.Generate(code, this, filePathBeforeModuleNamespace);
         }
 
         #endregion
@@ -98,7 +131,7 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Returns the module of the schema
         /// </summary>
-        public abstract string Module { get; }
+        public abstract NamespaceString Module { get; }
 
         /// <summary>
         /// The description of the schema
@@ -143,12 +176,6 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Almost standard file ending
         /// </summary>
-        protected string FileEnding
-        {
-            get
-            {
-                return ".schema.json";
-            }
-        }
+        protected const string FILE_ENDING =  ".schema.json";
     }
 }

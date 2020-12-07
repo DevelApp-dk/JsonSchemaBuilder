@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevelApp.JsonSchemaBuilder.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,13 +12,13 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
     {
         private StringBuilder _stringBuilder;
         
-        public CodeBuilder()
+        public CodeBuilder(int indentSpacesPerIndent = 4)
         {
             _stringBuilder = new StringBuilder();
         }
 
         /// <summary>
-        /// Appends a line to internal string builder and returns itself to allow for chaned calls
+        /// Appends a line to internal string builder and returns itself to allow for chained calls
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
@@ -27,9 +28,38 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             return this;
         }
 
+        /// <summary>
+        /// Called in the end of the code build to translate builder code into string
+        /// </summary>
+        /// <returns></returns>
         public string Build()
         {
-            return _stringBuilder.ToString();
+            if (_indent == 0)
+            {
+                return _stringBuilder.ToString();
+            }
+            else
+            {
+                throw new CodeGenerationException($"Indent has not been reset to zero indication an error in generated code");
+            }
+        }
+
+        private int _indent = 0;
+
+        /// <summary>
+        /// Increase indent for the code
+        /// </summary>
+        internal void IndentIncrease()
+        {
+            _indent += 1;
+        }
+
+        /// <summary>
+        /// Decrease indent for the code
+        /// </summary>
+        internal void IndentDecrease()
+        {
+            _indent -= 1;
         }
     }
 }

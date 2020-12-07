@@ -1,4 +1,5 @@
 ﻿using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+using DevelApp.JsonSchemaBuilder.Model;
 using Manatee.Json;
 using Manatee.Json.Schema;
 using System;
@@ -21,17 +22,17 @@ namespace DevelApp.JsonSchemaBuilder
             }
         }
 
-        public override string Module
+        public override NamespaceString Module
         {
             get
             {
-                return "Default";
+                return "DevelApp.Modules.Default";
             }
         }
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            return new JsonSchemaBuilderSchema(GetType().Name.Replace("JsonSchema",""), Description);
+            return new JsonSchemaBuilderSchema(Name, Description);
         }
     }
 }

@@ -35,3 +35,5 @@ Code generation is built based on the above schema parts
 ### Planned language support
 * PHP
 * TypeScript
+* VB
+* Java
