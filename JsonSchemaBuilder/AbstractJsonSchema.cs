@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Manatee.Json;
 using Manatee.Json.Schema;
 using Manatee.Json.Serialization;
 using System.IO;
 using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
-using DevelApp.JsonSchemaBuilder.Model;
 using DevelApp.JsonSchemaBuilder.CodeGeneration;
+using DevelApp.Utility.Model;
 
 namespace DevelApp.JsonSchemaBuilder
 {

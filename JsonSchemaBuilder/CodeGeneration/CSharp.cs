@@ -1,9 +1,6 @@
 ﻿using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
-using DevelApp.JsonSchemaBuilder.Model;
-using System;
+using DevelApp.Utility.Model;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 {

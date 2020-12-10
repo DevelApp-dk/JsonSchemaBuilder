@@ -1,10 +1,7 @@
 ﻿using DevelApp.JsonSchemaBuilder.Exceptions;
-using DevelApp.JsonSchemaBuilder.Model;
-using Manatee.Json;
+using DevelApp.Utility.Model;
 using Manatee.Json.Schema;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts

@@ -1,8 +1,4 @@
-﻿using DevelApp.JsonSchemaBuilder.Model;
-using Manatee.Json.Schema;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DevelApp.Utility.Model;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
