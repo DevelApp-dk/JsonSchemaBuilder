@@ -1,5 +1,6 @@
 ﻿using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
 using DevelApp.Utility.Model;
+using System;
 using System.Collections.Generic;
 
 namespace DevelApp.JsonSchemaBuilder.CodeGeneration
@@ -36,21 +37,63 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         {
             CodeBuilder codeBuilder = new CodeBuilder();
             GenerateStartOfSchema(codeBuilder, schema);
-            if (schema.Definitions.Count > 0)
-            {
-                codeBuilder.IndentIncrease();
-                GenerateStartOfDefinitions(codeBuilder);
-                codeBuilder.IndentIncrease();
-                foreach (KeyValuePair<IdentifierString, IJsonSchemaBuilderPart> pair in schema.Definitions)
-                {
-                    GenerateCodeForBuilderPart(codeBuilder, pair.Key, pair.Value);
-                }
-                codeBuilder.IndentDecrease();
-                GenerateEndOfDefinitions(codeBuilder);
-                codeBuilder.IndentDecrease();
-            }
+            GenerateCodeForBuilderPart(codeBuilder, schema.TopPart.Name, schema.TopPart, schema.Definitions);
             GenerateEndOfSchema(codeBuilder, schema);
             return codeBuilder.Build();
+        }
+
+        /// <summary>
+        /// Generates using parameters and initial class specification
+        /// </summary>
+        /// <param name="codeBuilder"></param>
+        /// <param name="schema"></param>
+        private void GenerateStartOfSchema(CodeBuilder codeBuilder, JsonSchemaBuilderSchema schema)
+        {
+            //TODO run through schema children to get all references to make sure they are included
+            codeBuilder
+                .L("using System;")
+                .EmptyLine()
+                .L($"namespace {_startNameSpace}")
+                .L("{")
+                .IndentIncrease();
+        }
+
+        private void GenerateEndOfSchema(CodeBuilder codeBuilder, JsonSchemaBuilderSchema schema)
+        {
+            codeBuilder
+                .IndentDecrease()
+                .L("}");
+        }
+
+        private void GenerateCodeForBuilderPart(CodeBuilder codeBuilder, IdentifierString key, IJsonSchemaBuilderPart value, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null)
+        {
+            switch (value.PartType)
+            {
+                case JsonSchemaBuilderPartType.Object:
+
+                    codeBuilder
+                        //TODO Add comment from description split on lines
+                        .L($"public partial class {key}")
+                        .L("{")
+                        .IndentIncrease();
+
+                    //Add definitions
+                    if (definitions != null)
+                    {
+                        foreach (KeyValuePair<IdentifierString, IJsonSchemaBuilderPart> pair in definitions)
+                        {
+                            GenerateCodeForBuilderPart(codeBuilder, pair.Key, pair.Value);
+                            codeBuilder.EmptyLine();
+                        }
+                    }
+
+                    //TODO Add own code
+
+                    codeBuilder
+                        .IndentDecrease()
+                        .L("}");
+                    break;
+            }
         }
     }
 }
