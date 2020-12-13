@@ -37,7 +37,18 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         {
             CodeBuilder codeBuilder = new CodeBuilder();
             GenerateStartOfSchema(codeBuilder, schema);
-            GenerateCodeForBuilderPart(codeBuilder, schema.TopPart.Name, schema.TopPart, schema.Definitions);
+            if (schema.TopPart.PartType == JsonSchemaBuilderPartType.Object)
+            {
+                GenerateCodeForBuilderPart(codeBuilder, schema.TopPart.Name, schema.TopPart, schema.Definitions);
+            }
+            else
+            {
+                Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
+                properties.Add(schema.Name, schema.TopPart);
+
+                JsonSchemaBuilderObject encasingObject = new JsonSchemaBuilderObject(schema.TopPart.Name, schema.TopPart.Description, properties: properties);
+                GenerateCodeForBuilderPart(codeBuilder, schema.TopPart.Name, encasingObject, schema.Definitions);
+            }
             GenerateEndOfSchema(codeBuilder, schema);
             return codeBuilder.Build();
         }
@@ -52,6 +63,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             //TODO run through schema children to get all references to make sure they are included
             codeBuilder
                 .L("using System;")
+                .L("using Newtonsoft.Json;")
                 .EmptyLine()
                 .L($"namespace {_startNameSpace}")
                 .L("{")
@@ -71,9 +83,9 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             {
                 case JsonSchemaBuilderPartType.Object:
 
+                    JsonSchemaBuilderObject jsonSchemaBuilderObject = value as JsonSchemaBuilderObject;
                     codeBuilder
                         //TODO Add comment from description split on lines
-                        .L($"[JsonProperty(PropertyName = \"{TransformToCamelCase(key)}\")]")
                         .L($"public partial class {TransformToTitleCase(key)}")
                         .L("{")
                         .IndentIncrease();
@@ -90,9 +102,24 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
                     //TODO Add own code
 
+                    //Add children
+                    foreach(KeyValuePair<IdentifierString, IJsonSchemaBuilderPart> pair in jsonSchemaBuilderObject.Properties)
+                    {
+                        GenerateCodeForBuilderPart(codeBuilder, pair.Key, pair.Value);
+                        codeBuilder.EmptyLine();
+                    }
+
                     codeBuilder
                         .IndentDecrease()
                         .L("}");
+                    break;
+
+                case JsonSchemaBuilderPartType.String:
+                    JsonSchemaBuilderString jsonSchemaBuilderString = value as JsonSchemaBuilderString;
+                    codeBuilder
+                        .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                        .L($"public string {TransformToTitleCase(key)} {{ get; set; }}")
+                        .EmptyLine();
                     break;
                 default:
                     codeBuilder.L($"throw new NotImplementedException(\"PartType {value.PartType} is not implemented\");");

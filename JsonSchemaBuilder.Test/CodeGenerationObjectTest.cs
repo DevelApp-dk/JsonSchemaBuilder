@@ -48,7 +48,7 @@ namespace JsonSchemaBuilder.Test
             properties.Add(booleanPart.Name, booleanPart);
             properties.Add(integerPart.Name, integerPart);
 
-            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("MyTopPart", "TopPart", properties: properties);
+            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("MyTopPartObject", "TopPart", properties: properties);
 
             return new JsonSchemaBuilderSchema("ObjectAsATopPart", Description, topPart: objectPart);
         }

@@ -14,8 +14,10 @@ namespace JsonSchemaBuilder.Test
         [Fact]
         public void StringAsTopPart()
         {
+            string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
+
             CodeGenerator codeGenerator = new CodeGenerator();
-            codeGenerator.Generate(Code.CSharp, new StringAsTopPartJsonSchema(), "./");
+            codeGenerator.Generate(Code.CSharp, new StringAsTopPartJsonSchema(), pathString);
         }
     }
 
@@ -40,7 +42,7 @@ namespace JsonSchemaBuilder.Test
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPart", "TopPart");
+            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPartString", "TopPart");
 
             return new JsonSchemaBuilderSchema("StringAsATopPart", Description, topPart: stringPart);
         }
