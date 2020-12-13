@@ -89,15 +89,15 @@ namespace DevelApp.JsonSchemaBuilder
             }
         }
 
-        private GenerateCode _generateCode;
+        private CodeGenerator _generateCode;
 
-        private GenerateCode CodeGeneration
+        private CodeGenerator CodeGeneration
         {
             get
             {
                 if(_generateCode == null)
                 {
-                    _generateCode = new GenerateCode();
+                    _generateCode = new CodeGenerator();
                 }
                 return _generateCode;
             }

@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevelApp.Utility" Version="1.0.4" />
+    <PackageReference Include="DevelApp.Utility" Version="1.0.5" />
     <PackageReference Include="manatee.json" Version="13.0.3" />
   </ItemGroup>
 

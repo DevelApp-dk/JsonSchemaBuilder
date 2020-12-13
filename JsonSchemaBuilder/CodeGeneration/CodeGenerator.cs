@@ -7,7 +7,7 @@ using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 {
-    public class GenerateCode
+    public class CodeGenerator
     {
         /// <summary>
         /// Generate code to memory and suggest a filename
@@ -37,10 +37,33 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         public void Generate(Code code, IJsonSchemaDefinition schema, string filePathBeforeNamespace)
         {
             var tuple = Generate(code, schema);
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(filePathBeforeNamespace, tuple.fileName)))
+            string fullPath = Path.Combine(filePathBeforeNamespace, tuple.fileName);
+
+            FileInfo fileInfo = new FileInfo(fullPath);
+            string directory = fileInfo.Directory.FullName;
+            try
             {
-                outputFile.Write(tuple.code);
-                outputFile.Flush();
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CodeGenerationException($"Could not create path {directory}", ex);
+            }
+
+            try
+            {
+                using (StreamWriter outputFile = new StreamWriter(fullPath))
+                {
+                    outputFile.Write(tuple.code);
+                    outputFile.Flush();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new CodeGenerationException($"Could not write code file to {fullPath}", ex);
             }
         }
     }

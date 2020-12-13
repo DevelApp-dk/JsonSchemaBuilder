@@ -73,7 +73,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
                     codeBuilder
                         //TODO Add comment from description split on lines
-                        .L($"public partial class {key}")
+                        .L($"[JsonProperty(PropertyName = \"{TransformToCamelCase(key)}\")]")
+                        .L($"public partial class {TransformToTitleCase(key)}")
                         .L("{")
                         .IndentIncrease();
 
@@ -93,7 +94,31 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         .IndentDecrease()
                         .L("}");
                     break;
+                default:
+                    codeBuilder.L($"throw new NotImplementedException(\"PartType {value.PartType} is not implemented\");");
+                    break;
             }
         }
+
+        /// <summary>
+        /// Transform string from TitleCase to camelCase
+        /// </summary>
+        /// <param name="stringToTransform"></param>
+        /// <returns></returns>
+        private string TransformToCamelCase(string stringToTransform)
+        {
+            return stringToTransform.Substring(0, 1).ToLowerInvariant() + stringToTransform.Substring(1);
+        }
+
+        /// <summary>
+        /// Transform string from camelCase to TitleCase
+        /// </summary>
+        /// <param name="stringToTransform"></param>
+        /// <returns></returns>
+        private string TransformToTitleCase(string stringToTransform)
+        {
+            return stringToTransform.Substring(0, 1).ToUpperInvariant() + stringToTransform.Substring(1);
+        }
+
     }
 }

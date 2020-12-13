@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSchemaBuilder", "JsonSchemaBuilder\JsonSchemaBuilder.csproj", "{7DF3E33E-D1FE-41D7-B7DB-C6E651A10C83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonSchemaBuilder.Test", "JsonSchemaBuilder.Test\JsonSchemaBuilder.Test.csproj", "{C49C0975-7B24-462C-9DA3-645520D9EFF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSchemaBuilder.Test", "JsonSchemaBuilder.Test\JsonSchemaBuilder.Test.csproj", "{C49C0975-7B24-462C-9DA3-645520D9EFF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelTest", "ModelTest\ModelTest.csproj", "{DA34807F-17B6-4992-9B30-4CF3E4041AA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C49C0975-7B24-462C-9DA3-645520D9EFF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C49C0975-7B24-462C-9DA3-645520D9EFF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C49C0975-7B24-462C-9DA3-645520D9EFF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA34807F-17B6-4992-9B30-4CF3E4041AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA34807F-17B6-4992-9B30-4CF3E4041AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA34807F-17B6-4992-9B30-4CF3E4041AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA34807F-17B6-4992-9B30-4CF3E4041AA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
