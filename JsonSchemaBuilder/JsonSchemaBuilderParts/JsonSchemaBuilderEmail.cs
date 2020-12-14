@@ -10,7 +10,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         public JsonSchemaBuilderEmail(
                 IdentifierString emailName,
                 string description,
-                string defaultValue,
+                string defaultValue = null,
                 bool isRequired = false)
             : base(emailName,
                 description,

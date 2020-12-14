@@ -46,10 +46,10 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             else
             {
                 Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
-                properties.Add(schema.Name, schema.TopPart);
+                properties.Add(schema.TopPart.Name, schema.TopPart);
 
-                JsonSchemaBuilderObject encasingObject = new JsonSchemaBuilderObject(schema.TopPart.Name, schema.TopPart.Description, properties: properties);
-                GenerateCodeForBuilderPart(codeBuilder, schema.TopPart.Name, encasingObject, schema.Definitions);
+                JsonSchemaBuilderObject encasingObject = new JsonSchemaBuilderObject(schema.Name, schema.Description, properties: properties);
+                GenerateCodeForBuilderPart(codeBuilder, schema.Name, encasingObject, schema.Definitions);
             }
             GenerateEndOfSchema(codeBuilder, schema);
             return codeBuilder.Build();
@@ -66,7 +66,9 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             codeBuilder
                 .L("using System;")
                 .L("using Newtonsoft.Json;")
+                .L("using Newtonsoft.Json.Converters;")
                 .L("using Ardalis.SmartEnum;")
+                .L("using System.Collections.Generic;")
                 .EmptyLine()
                 .L($"namespace {_startNameSpace}")
                 .L("{")
@@ -80,7 +82,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .L("}");
         }
 
-        private void GenerateCodeForBuilderPart(CodeBuilder codeBuilder, IdentifierString key, IJsonSchemaBuilderPart value, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null)
+        private void GenerateCodeForBuilderPart(CodeBuilder codeBuilder, IdentifierString key, IJsonSchemaBuilderPart value, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, bool parentIsArray = false)
         {
             switch (value.PartType)
             {
@@ -107,14 +109,17 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     break;
                 case JsonSchemaBuilderPartType.Boolean:
-                    JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean = value as JsonSchemaBuilderBoolean;
-                    if(jsonSchemaBuilderBoolean.Enums != null && jsonSchemaBuilderBoolean.Enums.Count > 0)
+                        JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean = value as JsonSchemaBuilderBoolean;
+                    if (jsonSchemaBuilderBoolean.Enums != null && jsonSchemaBuilderBoolean.Enums.Count > 0)
                     {
                         GenerateEnumBoolean(codeBuilder, key, jsonSchemaBuilderBoolean);
                     }
                     else
                     {
-                        GenerateOrdinaryBoolaen(codeBuilder, key, jsonSchemaBuilderBoolean);
+                        if (!parentIsArray)
+                        {
+                            GenerateOrdinaryBoolaen(codeBuilder, key, jsonSchemaBuilderBoolean);
+                        }
                     }
                     break;
                 case JsonSchemaBuilderPartType.Date:
@@ -136,7 +141,10 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     else
                     {
-                        GenerateOrdinaryDateTime(codeBuilder, key, jsonSchemaBuilderDateTime);
+                        if (!parentIsArray)
+                        {
+                            GenerateOrdinaryDateTime(codeBuilder, key, jsonSchemaBuilderDateTime);
+                        }
                     }
                     break;
                 case JsonSchemaBuilderPartType.Email:
@@ -158,7 +166,10 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     else
                     {
-                        GenerateOrdinaryInteger(codeBuilder, key, jsonSchemaBuilderInteger);
+                        if (!parentIsArray)
+                        {
+                            GenerateOrdinaryInteger(codeBuilder, key, jsonSchemaBuilderInteger);
+                        }
                     }
                     break;
                 case JsonSchemaBuilderPartType.Number:
@@ -169,7 +180,10 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     else
                     {
-                        GenerateOrdinaryNumber(codeBuilder, key, jsonSchemaBuilderNumber);
+                        if (!parentIsArray)
+                        {
+                            GenerateOrdinaryNumber(codeBuilder, key, jsonSchemaBuilderNumber);
+                        }
                     }
                     break;
                 case JsonSchemaBuilderPartType.Object:
@@ -180,7 +194,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     else
                     {
-                        GenerateOrdinaryObject(codeBuilder, key, jsonSchemaBuilderObject, definitions);
+                        GenerateOrdinaryObject(codeBuilder, key, jsonSchemaBuilderObject, definitions, parentIsArray);
                     }
                     break;
                 case JsonSchemaBuilderPartType.String:
@@ -231,7 +245,53 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateOrdinaryArray(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderArray jsonSchemaBuilderArray)
         {
-            throw new NotImplementedException();
+            foreach(IJsonSchemaBuilderPart part in jsonSchemaBuilderArray.Items)
+            {
+                GenerateCodeForBuilderPart(codeBuilder, part.Name, part, parentIsArray: true);
+            }
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderArray);
+
+            if (jsonSchemaBuilderArray.Items.Count == 1)
+            {
+                codeBuilder
+                    .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                    .L($"public List<{MakeCorrectItemType(jsonSchemaBuilderArray.Items[0])}> {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderArray)}")
+                    .EmptyLine();
+            }
+            else
+            {
+                throw new NotImplementedException("Array with more than one item is not implemented");
+            }
+        }
+
+        private string MakeCorrectItemType(IJsonSchemaBuilderPart jsonSchemaBuilderPart)
+        {
+            switch(jsonSchemaBuilderPart.PartType)
+            {
+                case JsonSchemaBuilderPartType.Object:
+                    return jsonSchemaBuilderPart.Name;
+                case JsonSchemaBuilderPartType.Integer:
+                    return "long";
+                case JsonSchemaBuilderPartType.Number:
+                    return "double";
+                case JsonSchemaBuilderPartType.Boolean:
+                    return "bool";
+                case JsonSchemaBuilderPartType.String:
+                    return "string";
+                case JsonSchemaBuilderPartType.Date:
+                    return "Date";
+                case JsonSchemaBuilderPartType.DateTime:
+                    return "DateTime";
+                case JsonSchemaBuilderPartType.Base64Binary:
+                    return "Base64BinaryString";
+                case JsonSchemaBuilderPartType.Email:
+                    return "Email";
+                case JsonSchemaBuilderPartType.UriReference:
+                    return "UriReferenceString";
+                default:
+                    throw new NotImplementedException();
+            }
+
         }
 
         #endregion
@@ -287,7 +347,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateOrdinaryDateTime(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime)
         {
-            throw new NotImplementedException();
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderDateTime);
+
+            codeBuilder
+                .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                .L($"public DateTime{BuildRequired(jsonSchemaBuilderDateTime.IsRequired)} {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderDateTime)}")
+                .EmptyLine();
         }
 
         private void GenerateEnumDateTime(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime)
@@ -334,7 +399,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateOrdinaryNumber(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderNumber jsonSchemaBuilderNumber)
         {
-            throw new NotImplementedException();
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderNumber);
+
+            codeBuilder
+                .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                .L($"public double{BuildRequired(jsonSchemaBuilderNumber.IsRequired)} {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderNumber)}")
+                .EmptyLine();
         }
 
         private void GenerateEnumNumber(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderNumber jsonSchemaBuilderNumber)
@@ -351,10 +421,11 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             throw new NotImplementedException();
         }
 
-        private void GenerateOrdinaryObject(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderObject jsonSchemaBuilderObject, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions)
+        private void GenerateOrdinaryObject(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderObject jsonSchemaBuilderObject, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions, bool parentIsArray)
         {
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderObject);
+
             codeBuilder
-                //TODO Add comment from description split on lines
                 .L($"public partial class {TransformToTitleCase(key)}")
                 .L("{")
                 .IndentIncrease();
@@ -383,7 +454,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .L("}");
 
 
-            if (definitions == null)// Assume not top part
+            if (definitions == null && !parentIsArray)// Assume not top part
             {
                 codeBuilder
                     .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
@@ -398,10 +469,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumString(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderString jsonSchemaBuilderString)
         {
-            GenerateComments(codeBuilder, key, jsonSchemaBuilderString);
-
             codeBuilder
-                .L($"public enum {TransformToTitleCase(key)}")
+                .L($"public enum {TransformToTitleCase(key)}Enum")
                 .L("{")
                 .IndentIncrease();
             for(int counter = 0;counter < jsonSchemaBuilderString.Enums.Count;counter += 1)
@@ -414,9 +483,11 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             codeBuilder
                 .IndentDecrease()
                 .L("}")
-                .EmptyLine()
+                .EmptyLine();
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderString);
+            codeBuilder
                 .L($"[JsonProperty(\"{TransformToCamelCase(key)}\"), JsonConverter(typeof(StringEnumConverter))]") 
-                .L($"public {TransformToTitleCase(key)} {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderString)}")
+                .L($"public {TransformToTitleCase(key)}Enum {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderString)}")
                 .EmptyLine();
         }
 
@@ -472,10 +543,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         {
             List<string> commentLines = GenerateCommentLines(key, jsonSchemaBuilderPart.Description, minSplitLength: 70, maxSplitLength: 90);
 
-            foreach(string commentLine in commentLines)
+            codeBuilder.L("/// <summary>");
+            foreach (string commentLine in commentLines)
             {
                 codeBuilder.L($"/// {commentLine}");
             }
+            codeBuilder.L("/// </summary>");
         }
 
         private List<string> GenerateCommentLines(IdentifierString key, string description, int minSplitLength, int maxSplitLength)
@@ -494,6 +567,11 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderString jsonSchemaBuilderString)
         {
             return string.IsNullOrWhiteSpace(jsonSchemaBuilderString.DefaultValue) ? string.Empty : $" = \"{jsonSchemaBuilderString.DefaultValue}\";";
+        }
+
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime)
+        {
+            return string.IsNullOrWhiteSpace(jsonSchemaBuilderDateTime.DefaultValue) ? string.Empty : $" = \"{jsonSchemaBuilderDateTime.DefaultValue}\";";
         }
 
         private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean)
@@ -521,6 +599,29 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderNumber jsonSchemaBuilderNumber)
+        {
+            if (jsonSchemaBuilderNumber.DefaultValue.HasValue)
+            {
+                return $" = {jsonSchemaBuilderNumber.DefaultValue.Value};";
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderArray jsonSchemaBuilderArray)
+        {
+            if (jsonSchemaBuilderArray.DefaultValue != null)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
 
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using DevelApp.Utility.Model;
+﻿using DevelApp.JsonSchemaBuilder.Exceptions;
+using DevelApp.Utility.Model;
 using Manatee.Json;
 using Manatee.Json.Schema;
 using System.Collections.Generic;
@@ -14,6 +15,10 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             uint? minItems = null, uint? maxItems = null, bool uniqueItems = false, JsonValue defaultValue = null, List<JsonValue> examples = null, List<JsonValue> enums = null, bool isRequired = false) 
             : base(arrayName, description, isRequired, defaultValue, examples, enums)
         {
+            if(items == null || items.Count == 0)
+            {
+                throw new JsonSchemaBuilderException($"An array without defined content does not make sense. {nameof(items)} has not been defined");
+            }
             Items = items;
             MinItems = minItems;
             MaxItems = maxItems;
