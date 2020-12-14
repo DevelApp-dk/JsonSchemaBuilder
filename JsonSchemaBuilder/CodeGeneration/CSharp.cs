@@ -398,7 +398,26 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumString(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderString jsonSchemaBuilderString)
         {
-            throw new NotImplementedException();
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderString);
+
+            codeBuilder
+                .L($"public enum {TransformToTitleCase(key)}")
+                .L("{")
+                .IndentIncrease();
+            for(int counter = 0;counter < jsonSchemaBuilderString.Enums.Count;counter += 1)
+            {
+                bool last = counter + 1 == jsonSchemaBuilderString.Enums.Count;
+                string enumString = TransformToTitleCase(jsonSchemaBuilderString.Enums[counter]) + (last?"":",");
+                codeBuilder
+                    .L(enumString);
+            }
+            codeBuilder
+                .IndentDecrease()
+                .L("}")
+                .EmptyLine()
+                .L($"[JsonProperty(\"{TransformToCamelCase(key)}\"), JsonConverter(typeof(StringEnumConverter))]") 
+                .L($"public {TransformToTitleCase(key)} {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderString)}")
+                .EmptyLine();
         }
 
         private void GenerateOrdinaryString(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderString jsonSchemaBuilderString)
