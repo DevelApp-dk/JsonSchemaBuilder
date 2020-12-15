@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DevelApp.JsonSchemaBuilder</AssemblyName>
+    <RootNamespace>DevelApp.JsonSchemaBuilder</RootNamespace>
+    <Authors>Lars Shakya Buch-Jepsen</Authors>
+    <Company>DevelApp Denmark (CVR 33211740)</Company>
+    <Copyright>Copyright © DevelApp 2020</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/DevelApp-dk/JsonSchemaBuilder</RepositoryUrl>
+    <Description>Simple Json Schema builder for Manatee.Json to make it faster to combine in code</Description>
+    <Version>1.0.8</Version>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.SmartEnum" Version="2.0.0" />
+    <PackageReference Include="DevelApp.Utility" Version="1.0.5" />
+    <PackageReference Include="manatee.json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
