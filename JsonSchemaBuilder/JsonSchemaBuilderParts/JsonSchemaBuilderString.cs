@@ -66,9 +66,14 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
                 returnSchema.MaxLength(MaxLength.Value);
             }
 
-            if (string.IsNullOrWhiteSpace(Pattern))
+            if (!string.IsNullOrWhiteSpace(Pattern))
             {
                 returnSchema.Pattern(Pattern);
+            }
+
+            if(!string.IsNullOrWhiteSpace(Format))
+            {
+                returnSchema.Format(Format);
             }
 
             return returnSchema;

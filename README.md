@@ -24,7 +24,7 @@ My intention is to support all parts of the official Json Schema Draft 7 and som
 * **Time**
 * **UriReference**
 
-  This has the limitation that it does not get referenced schemas and expect referenced schemas to be located locally.
+  This has the limitation that it does not get referenced schemas and expect referenced schemas to be located locally. References can only be referencing part of definitions or entire schema.
 
 ## Code generation
 Code generation is built based on the above schema parts
@@ -37,3 +37,19 @@ Code generation is built based on the above schema parts
 * TypeScript
 * VB
 * Java
+* TSQL DDL for Database First approach to development
+* C# Entities for Code First approach to development
+
+## TODO
+* Create Email data class (with System.Net.Mail.MailAddress as inner?)
+* Create DataString data class to replace string ?
+* Add implicit casts in classes
+* Add Base64String with conversions
+* More intelligent testing if possible for serialization of export formats
+* Support for AnyOf, OneOf and AllOf (last done through conversion)
+* C#: Expand support for serializer other than Newtonsoft version
+  * Microsoft own
+  * Akka.Net serializer Hyperion
+* Support for later than Draft 7 schema
+* Use of Microsoft own serializer and [json-everything](https://github.com/gregsdennis/json-everything) instead of [Manatee.Json](https://github.com/gregsdennis/Manatee.Json)
+* Better support for UriReference

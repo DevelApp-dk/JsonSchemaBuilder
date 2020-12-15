@@ -1,7 +1,12 @@
-﻿using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
+﻿using DevelApp.JsonSchemaBuilder.Exceptions;
+using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
 using DevelApp.Utility.Model;
+using Manatee.Json;
+using Manatee.Json.Schema;
+using Manatee.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -69,6 +74,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .L("using Newtonsoft.Json.Converters;")
                 .L("using Ardalis.SmartEnum;")
                 .L("using System.Collections.Generic;")
+                .L("using System.Net.Mail;")
                 .EmptyLine()
                 .L($"namespace {_startNameSpace}")
                 .L("{")
@@ -95,17 +101,6 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     else
                     {
                         GenerateOrdinaryArray(codeBuilder, key, jsonSchemaBuilderArray);
-                    }
-                    break;
-                case JsonSchemaBuilderPartType.Base64Binary:
-                    JsonSchemaBuilderBase64Binary jsonSchemaBuilderBase64Binary = value as JsonSchemaBuilderBase64Binary;
-                    if (jsonSchemaBuilderBase64Binary.Enums != null && jsonSchemaBuilderBase64Binary.Enums.Count > 0)
-                    {
-                        GenerateEnumBase64Binary(codeBuilder, key, jsonSchemaBuilderBase64Binary);
-                    }
-                    else
-                    {
-                        GenerateOrdinaryBase64Binary(codeBuilder, key, jsonSchemaBuilderBase64Binary);
                     }
                     break;
                 case JsonSchemaBuilderPartType.Boolean:
@@ -268,6 +263,9 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         {
             switch(jsonSchemaBuilderPart.PartType)
             {
+                case JsonSchemaBuilderPartType.Array:
+                    //TODO support multiple items
+                    return $"List<{MakeCorrectItemType((jsonSchemaBuilderPart as JsonSchemaBuilderArray).Items.First())}>";
                 case JsonSchemaBuilderPartType.Object:
                     return jsonSchemaBuilderPart.Name;
                 case JsonSchemaBuilderPartType.Integer:
@@ -279,33 +277,17 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 case JsonSchemaBuilderPartType.String:
                     return "string";
                 case JsonSchemaBuilderPartType.Date:
-                    return "Date";
+                    return "DateTime";
                 case JsonSchemaBuilderPartType.DateTime:
                     return "DateTime";
-                case JsonSchemaBuilderPartType.Base64Binary:
-                    return "Base64BinaryString";
                 case JsonSchemaBuilderPartType.Email:
                     return "Email";
-                case JsonSchemaBuilderPartType.UriReference:
-                    return "UriReferenceString";
+                case JsonSchemaBuilderPartType.Time:
+                    return "DateTime";
                 default:
                     throw new NotImplementedException();
             }
 
-        }
-
-        #endregion
-
-        #region Generate Base64 Binary
-
-        private void GenerateOrdinaryBase64Binary(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderBase64Binary jsonSchemaBuilderBase64Binary)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void GenerateEnumBase64Binary(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderBase64Binary jsonSchemaBuilderBase64Binary)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion
@@ -333,7 +315,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateOrdinaryDate(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDate jsonSchemaBuilderDate)
         {
-            throw new NotImplementedException();
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderDate);
+
+            codeBuilder
+                .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                .L($"public DateTime{BuildRequired(jsonSchemaBuilderDate.IsRequired)} {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderDate)}")
+                .EmptyLine();
         }
 
         private void GenerateEnumDate(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDate jsonSchemaBuilderDate)
@@ -371,7 +358,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateOrdinaryEmail(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderEmail jsonSchemaBuilderEmail)
         {
-            throw new NotImplementedException();
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderEmail);
+
+            codeBuilder
+                .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                .L($"public MailAddress {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderEmail)}")
+                .EmptyLine();
         }
 
         #endregion
@@ -512,7 +504,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateOrdinaryTime(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderTime jsonSchemaBuilderTime)
         {
-            throw new NotImplementedException();
+            GenerateComments(codeBuilder, key, jsonSchemaBuilderTime);
+
+            codeBuilder
+                .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                .L($"public DateTime{BuildRequired(jsonSchemaBuilderTime.IsRequired)} {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderTime)}")
+                .EmptyLine();
         }
 
         #endregion
@@ -526,8 +523,157 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateOrdinaryUriReference(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (Uri.TryCreate(jsonSchemaBuilderUriReference.LocalFileLocation, UriKind.RelativeOrAbsolute, out Uri uri))
+                {
+                    if (uri.IsLoopback && uri.IsFile)
+                    {
+                        //Search for the schema file as .schema.json and .json and load it when found
+                        string pathAndFileString = uri.LocalPath;
+                        string schemaString = string.Empty;
+                        if (File.Exists(pathAndFileString))
+                        {
+                            schemaString = File.ReadAllText(pathAndFileString);
+                        }
+                        else if (File.Exists(pathAndFileString + ".schema.json"))
+                        {
+                            schemaString = File.ReadAllText(pathAndFileString + ".schema.json");
+                        }
+                        else if (File.Exists(pathAndFileString + ".json"))
+                        {
+                            schemaString = File.ReadAllText(pathAndFileString + ".json");
+                        }
+                        else
+                        {
+                            throw new CodeGenerationException($"Schema could not be found at the path {pathAndFileString}");
+                        }
+                        // make a schema and generate code from that
+                        JsonValue jsonValueOfSchema = JsonValue.Parse(schemaString);
+                        if(string.IsNullOrWhiteSpace(jsonSchemaBuilderUriReference.ObjectReference) ||
+                            jsonSchemaBuilderUriReference.ObjectReference.Equals("/"))
+                        {
+                            //Process schema Json
+                            GenerateCodeFromSchema(codeBuilder, jsonValueOfSchema, key, jsonSchemaBuilderUriReference);
+                        }
+                        else if(jsonSchemaBuilderUriReference.ObjectReference.ToLowerInvariant().StartsWith("/definitions/"))
+                        {
+                            JsonSerializer jsonSerializer = new JsonSerializer();
+                            JsonSchema jsonSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValueOfSchema);
+                            string afterDefinitions = jsonSchemaBuilderUriReference.ObjectReference.ToLowerInvariant().Replace("/definitions/", "");
+                            if(jsonSchema.Definitions() != null && jsonSchema.Definitions().TryGetValue(afterDefinitions, out JsonSchema subSchema))
+                            {
+                                //Process subschema Json
+                                GenerateCodeFromSchema(codeBuilder, subSchema.ToJson(jsonSerializer), key, jsonSchemaBuilderUriReference);
+                            }
+                            else
+                            {
+                                throw new CodeGenerationException($"Could not find {afterDefinitions} in the definitions of the schema");
+                            }
+                        }
+                        else
+                        {
+                            throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
+                        }
+                    }
+                    else
+                    {
+                        throw new NotImplementedException($"Uri {uri} is not supported");
+                    }
+                }
+                else
+                {
+                    throw new CodeGenerationException($"{nameof(jsonSchemaBuilderUriReference.LocalFileLocation)} provides a invalid Uri");
+                }
+            }
+            catch (CodeGenerationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new CodeGenerationException($"GenerateOrdinaryUriReference failed for some reason", ex);
+            }
         }
+
+        private void GenerateCodeFromSchema(CodeBuilder codeBuilder, JsonValue jsonValueOfSchema, IdentifierString key, JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference)
+        {
+            if (jsonValueOfSchema.Type == JsonValueType.Object)
+            {
+                JsonObject schemaObject = jsonValueOfSchema.Object;
+
+                GenerateComments(codeBuilder, key, jsonSchemaBuilderUriReference);
+
+                codeBuilder
+                    .L($"[JsonProperty(\"{TransformToCamelCase(key)}\")]")
+                    .L($"public {MakeCorrectItemType(jsonValueOfSchema)} {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderUriReference)}")
+                    .EmptyLine();
+            }
+            else
+            {
+                throw new CodeGenerationException($"GenerateOrdinaryUriReference references an invalid schema");
+            }
+        }
+
+        private string MakeCorrectItemType(JsonValue jsonValueOfSchema)
+        {
+            JsonObject jsonObjectOfSchema = jsonValueOfSchema.Object;
+            string name = string.Empty;
+            if (jsonObjectOfSchema.TryGetValue("$id", out JsonValue jsonValueId))
+            {
+                name = jsonValueId.String;
+            }
+            else if (jsonObjectOfSchema.TryGetValue("title", out JsonValue jsonValueTitle))
+            {
+                name = jsonValueTitle.String;
+            }
+            else
+            {
+                throw new CodeGenerationException($"GenerateOrdinaryUriReference has neither title nor id");
+            }
+            string type = string.Empty;
+            if (jsonObjectOfSchema.TryGetValue("type", out JsonValue jsonValueType))
+            {
+                type = jsonValueType.String;
+            }
+            else
+            {
+                throw new CodeGenerationException($"GenerateOrdinaryUriReference has no type");
+            }
+            string format = string.Empty;
+            if (jsonObjectOfSchema.TryGetValue("format", out JsonValue jsonValueFormat))
+            {
+                format = jsonValueFormat.String;
+            }
+            switch(type)
+            {
+                case "string":
+                    if(string.IsNullOrWhiteSpace(format))
+                    {
+                        return "string";
+                    }
+                    switch(format)
+                    {
+                        case "time":
+                        case "date":
+                        case "datetime":
+                            return "DateTime";
+                        case "email":
+                            return "Email";
+                    }
+                    break;
+                case "boolean":
+                    return "bool";
+                case "object":
+                    return TransformToTitleCase(name);
+                case "number":
+                    return "double";
+                case "integer":
+                    return "long";
+            }
+            throw new NotImplementedException($"Type {type} with name {name} and format {format} is not supported");
+        }
+    
 
         #endregion
 
@@ -569,9 +715,22 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             return string.IsNullOrWhiteSpace(jsonSchemaBuilderString.DefaultValue) ? string.Empty : $" = \"{jsonSchemaBuilderString.DefaultValue}\";";
         }
 
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderEmail jsonSchemaBuilderEmail)
+        {
+            return string.IsNullOrWhiteSpace(jsonSchemaBuilderEmail.DefaultValue) ? string.Empty : $" = new MailAddress(\"{jsonSchemaBuilderEmail.DefaultValue}\");";
+        }
+
         private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime)
         {
-            return string.IsNullOrWhiteSpace(jsonSchemaBuilderDateTime.DefaultValue) ? string.Empty : $" = \"{jsonSchemaBuilderDateTime.DefaultValue}\";";
+            return string.IsNullOrWhiteSpace(jsonSchemaBuilderDateTime.DefaultValue) ? string.Empty : $" = DateTime.Parse(\"{jsonSchemaBuilderDateTime.DefaultValue}\");";
+        }
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderDate jsonSchemaBuilderDate)
+        {
+            return string.IsNullOrWhiteSpace(jsonSchemaBuilderDate.DefaultValue) ? string.Empty : $" = DateTime.Parse(\"{jsonSchemaBuilderDate.DefaultValue}\");";
+        }
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderTime jsonSchemaBuilderTime)
+        {
+            return string.IsNullOrWhiteSpace(jsonSchemaBuilderTime.DefaultValue) ? string.Empty : $" = DateTime.Parse(\"{jsonSchemaBuilderTime.DefaultValue}\");";
         }
 
         private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean)
@@ -615,6 +774,18 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         {
             if (jsonSchemaBuilderArray.DefaultValue != null)
             {
+                return $" = new List<{MakeCorrectItemType(jsonSchemaBuilderArray.Items[0])}>();{{{jsonSchemaBuilderArray.DefaultValue.ToString()}}}";
+            }
+            else
+            {
+                return $" = new List<{MakeCorrectItemType(jsonSchemaBuilderArray.Items[0])}>();";
+            }
+        }
+
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference)
+        {
+            if(jsonSchemaBuilderUriReference.DefaultValue != null)
+            {
                 throw new NotImplementedException();
             }
             else
@@ -622,6 +793,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 return string.Empty;
             }
         }
+
 
 
         #endregion

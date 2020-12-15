@@ -52,7 +52,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             //Add properties
             foreach (IJsonSchemaBuilderPart property in Properties.Values)
             {
-                returnSchema.Properties().Add(StartWithSmallLetter(property.Name),property.AsJsonSchema() );
+                returnSchema.Property(StartWithSmallLetter(property.Name), property.AsJsonSchema());
             }
             //Add required
             List<string> requiredNames = new List<string>();

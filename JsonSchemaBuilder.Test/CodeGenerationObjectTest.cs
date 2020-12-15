@@ -16,8 +16,10 @@ namespace JsonSchemaBuilder.Test
         {
             string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
+            IJsonSchemaDefinition jsonSchemaDefinition = new ObjectAsTopPartJsonSchema();
+            jsonSchemaDefinition.WriteSchemaToFile(pathString);
             CodeGenerator codeGenerator = new CodeGenerator();
-            codeGenerator.Generate(Code.CSharp, new ObjectAsTopPartJsonSchema(), pathString);
+            codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
         }
     }
 

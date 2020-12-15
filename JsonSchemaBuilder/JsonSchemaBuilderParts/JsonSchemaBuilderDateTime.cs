@@ -17,7 +17,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
               description, 
               format:"date-time",
               pattern: "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2})\\:(\\d{2})\\:(\\d{2})(\\.\\d{1,7})?([+-](\\d{2})\\:(\\d{2}))?$", 
-              defaultValue: defaultValue.HasValue? defaultValue.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK"):null,
+              defaultValue: defaultValue.HasValue? defaultValue.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz"):null,
               isRequired: isRequired)
             {
             }
