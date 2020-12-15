@@ -9,14 +9,14 @@ using Xunit;
 
 namespace JsonSchemaBuilder.Test
 {
-    public class CodeGenerationStringTest
+    public class CodeGenerationUriReferenceTest
     {
         //[Fact]
-        //public void StringAsTopPart()
+        //public void UriReferenceAsTopPart()
         //{
         //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
-        //    IJsonSchemaDefinition jsonSchemaDefinition = new StringAsTopPartJsonSchema();
+        //    IJsonSchemaDefinition jsonSchemaDefinition = new UriReferenceAsTopPartJsonSchema();
         //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
         //    CodeGenerator codeGenerator = new CodeGenerator();
         //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
@@ -24,7 +24,7 @@ namespace JsonSchemaBuilder.Test
     }
 
 
-    public class StringAsTopPartJsonSchema : AbstractJsonSchema
+    public class UriReferenceAsTopPartJsonSchema : AbstractJsonSchema
     {
         public override NamespaceString Module
         {
@@ -38,15 +38,16 @@ namespace JsonSchemaBuilder.Test
         {
             get
             {
-                return "Used to test string as a top part";
+                return "Used to test uri reference as a top part";
             }
         }
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPartString", "TopPart");
+            JsonSchemaBuilderUriReference uriReferencePart = new JsonSchemaBuilderUriReference("MyTopPartUriReference", "TopPart",
+                localFileLocation:"file:///E:/Projects/JsonSchemaBuilder/ModelTest/Funny/Onion/dateAsTopPart",objectReference: "#/");
 
-            return new JsonSchemaBuilderSchema("StringAsATopPart", Description, topPart: stringPart);
+            return new JsonSchemaBuilderSchema("UriReferencesATopPart", Description, topPart: uriReferencePart);
         }
     }
 }

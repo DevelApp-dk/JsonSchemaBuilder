@@ -9,21 +9,21 @@ using Xunit;
 
 namespace JsonSchemaBuilder.Test
 {
-    public class CodeGenerationObjectTest
+    public class CodeGenerationArrayOfArrayOfObjectsTest
     {
         //[Fact]
-        //public void ObjectAsTopPart()
+        //public void ArrayOfArrayOfObjectsAsTopPart()
         //{
         //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
-        //    IJsonSchemaDefinition jsonSchemaDefinition = new ObjectAsTopPartJsonSchema();
+        //    IJsonSchemaDefinition jsonSchemaDefinition = new ArrayOfArrayOfObjectsAsTopPartJsonSchema();
         //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
         //    CodeGenerator codeGenerator = new CodeGenerator();
         //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
         //}
     }
 
-    public class ObjectAsTopPartJsonSchema : AbstractJsonSchema
+    public class ArrayOfArrayOfObjectsAsTopPartJsonSchema : AbstractJsonSchema
     {
         public override NamespaceString Module
         {
@@ -37,7 +37,7 @@ namespace JsonSchemaBuilder.Test
         {
             get
             {
-                return "Used to test object as a top part";
+                return "Used to test array of arry of object as a top part";
             }
         }
 
@@ -50,9 +50,17 @@ namespace JsonSchemaBuilder.Test
             properties.Add(booleanPart.Name, booleanPart);
             properties.Add(integerPart.Name, integerPart);
 
-            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("MyTopPartObject", "TopPart", properties: properties);
+            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("ObjectInAnArrayOfAnArray", "ObjectInAnArrayOfAnArray is fun", properties: properties);
 
-            return new JsonSchemaBuilderSchema("ObjectAsATopPart", Description, topPart: objectPart);
+            List<IJsonSchemaBuilderPart> innerItems = new List<IJsonSchemaBuilderPart>();
+            innerItems.Add(objectPart);
+            JsonSchemaBuilderArray innerArrayPart = new JsonSchemaBuilderArray("InnerArray", "InnerArrayPart", innerItems);
+
+            List<IJsonSchemaBuilderPart> items = new List<IJsonSchemaBuilderPart>();
+            items.Add(innerArrayPart);
+            JsonSchemaBuilderArray arrayPart = new JsonSchemaBuilderArray("MyTopPartArrayOfArray", "TopPart", items);
+
+            return new JsonSchemaBuilderSchema("ArrayOfObjectsAsATopPart", Description, topPart: arrayPart);
         }
     }
 }

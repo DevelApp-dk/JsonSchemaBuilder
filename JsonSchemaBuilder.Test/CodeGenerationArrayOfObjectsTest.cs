@@ -9,21 +9,21 @@ using Xunit;
 
 namespace JsonSchemaBuilder.Test
 {
-    public class CodeGenerationObjectTest
+    public class CodeGenerationArrayOfObjectsTest
     {
         //[Fact]
-        //public void ObjectAsTopPart()
+        //public void ArrayOfObjectsAsTopPart()
         //{
         //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
-        //    IJsonSchemaDefinition jsonSchemaDefinition = new ObjectAsTopPartJsonSchema();
+        //    IJsonSchemaDefinition jsonSchemaDefinition = new ArrayOfObjectsAsTopPartJsonSchema();
         //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
         //    CodeGenerator codeGenerator = new CodeGenerator();
         //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
         //}
     }
 
-    public class ObjectAsTopPartJsonSchema : AbstractJsonSchema
+    public class ArrayOfObjectsAsTopPartJsonSchema : AbstractJsonSchema
     {
         public override NamespaceString Module
         {
@@ -50,9 +50,13 @@ namespace JsonSchemaBuilder.Test
             properties.Add(booleanPart.Name, booleanPart);
             properties.Add(integerPart.Name, integerPart);
 
-            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("MyTopPartObject", "TopPart", properties: properties);
+            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("ObjectInAnArray", "ObjectInAnArray is fun", properties: properties);
 
-            return new JsonSchemaBuilderSchema("ObjectAsATopPart", Description, topPart: objectPart);
+            List<IJsonSchemaBuilderPart> items = new List<IJsonSchemaBuilderPart>();
+            items.Add(objectPart);
+            JsonSchemaBuilderArray arrayPart = new JsonSchemaBuilderArray("MyTopPartArray", "TopPart", items);
+
+            return new JsonSchemaBuilderSchema("ArrayOfObjectsAsATopPart", Description, topPart: arrayPart);
         }
     }
 }

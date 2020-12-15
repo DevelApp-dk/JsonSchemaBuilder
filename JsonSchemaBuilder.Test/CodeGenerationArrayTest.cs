@@ -9,14 +9,14 @@ using Xunit;
 
 namespace JsonSchemaBuilder.Test
 {
-    public class CodeGenerationStringTest
+    public class CodeGenerationArrayTest
     {
         //[Fact]
-        //public void StringAsTopPart()
+        //public void ArrayAsTopPart()
         //{
         //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
-        //    IJsonSchemaDefinition jsonSchemaDefinition = new StringAsTopPartJsonSchema();
+        //    IJsonSchemaDefinition jsonSchemaDefinition = new ArrayAsTopPartJsonSchema();
         //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
         //    CodeGenerator codeGenerator = new CodeGenerator();
         //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
@@ -24,7 +24,7 @@ namespace JsonSchemaBuilder.Test
     }
 
 
-    public class StringAsTopPartJsonSchema : AbstractJsonSchema
+    public class ArrayAsTopPartJsonSchema : AbstractJsonSchema
     {
         public override NamespaceString Module
         {
@@ -44,9 +44,13 @@ namespace JsonSchemaBuilder.Test
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPartString", "TopPart");
+            List<IJsonSchemaBuilderPart> items = new List<IJsonSchemaBuilderPart>();
 
-            return new JsonSchemaBuilderSchema("StringAsATopPart", Description, topPart: stringPart);
+            items.Add(new JsonSchemaBuilderInteger("SwanNumber", "Swans are relevant in the world"));
+
+            JsonSchemaBuilderArray arrayPart = new JsonSchemaBuilderArray("MyTopPartArray", "TopPart", items);
+
+            return new JsonSchemaBuilderSchema("ArrayAsATopPart", Description, topPart: arrayPart);
         }
     }
 }

@@ -9,14 +9,14 @@ using Xunit;
 
 namespace JsonSchemaBuilder.Test
 {
-    public class CodeGenerationStringTest
+    public class CodeGenerationEmailTest
     {
         //[Fact]
-        //public void StringAsTopPart()
+        //public void EmailAsTopPart()
         //{
         //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
-        //    IJsonSchemaDefinition jsonSchemaDefinition = new StringAsTopPartJsonSchema();
+        //    IJsonSchemaDefinition jsonSchemaDefinition = new EmailAsTopPartJsonSchema();
         //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
         //    CodeGenerator codeGenerator = new CodeGenerator();
         //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
@@ -24,7 +24,7 @@ namespace JsonSchemaBuilder.Test
     }
 
 
-    public class StringAsTopPartJsonSchema : AbstractJsonSchema
+    public class EmailAsTopPartJsonSchema : AbstractJsonSchema
     {
         public override NamespaceString Module
         {
@@ -38,15 +38,15 @@ namespace JsonSchemaBuilder.Test
         {
             get
             {
-                return "Used to test string as a top part";
+                return "Used to test email as a top part";
             }
         }
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPartString", "TopPart");
+            JsonSchemaBuilderEmail emailPart = new JsonSchemaBuilderEmail("MyTopPartEmail", "TopPart", defaultValue:"riger@support.com");
 
-            return new JsonSchemaBuilderSchema("StringAsATopPart", Description, topPart: stringPart);
+            return new JsonSchemaBuilderSchema("EmailAsATopPart", Description, topPart: emailPart);
         }
     }
 }

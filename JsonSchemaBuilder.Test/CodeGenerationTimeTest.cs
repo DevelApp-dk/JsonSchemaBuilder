@@ -9,14 +9,14 @@ using Xunit;
 
 namespace JsonSchemaBuilder.Test
 {
-    public class CodeGenerationStringTest
+    public class CodeGenerationTimeTest
     {
         //[Fact]
-        //public void StringAsTopPart()
+        //public void TimeAsTopPart()
         //{
         //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
-        //    IJsonSchemaDefinition jsonSchemaDefinition = new StringAsTopPartJsonSchema();
+        //    IJsonSchemaDefinition jsonSchemaDefinition = new TimeAsTopPartJsonSchema();
         //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
         //    CodeGenerator codeGenerator = new CodeGenerator();
         //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
@@ -24,7 +24,7 @@ namespace JsonSchemaBuilder.Test
     }
 
 
-    public class StringAsTopPartJsonSchema : AbstractJsonSchema
+    public class TimeAsTopPartJsonSchema : AbstractJsonSchema
     {
         public override NamespaceString Module
         {
@@ -38,15 +38,15 @@ namespace JsonSchemaBuilder.Test
         {
             get
             {
-                return "Used to test string as a top part";
+                return "Used to test time as a top part";
             }
         }
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPartString", "TopPart");
+            JsonSchemaBuilderTime timePart = new JsonSchemaBuilderTime("MyTopPartTime", "TopPart", defaultValue: new DateTime(2020,1,1,15,30,48,765));
 
-            return new JsonSchemaBuilderSchema("StringAsATopPart", Description, topPart: stringPart);
+            return new JsonSchemaBuilderSchema("TimeAsATopPart", Description, topPart: timePart);
         }
     }
 }
