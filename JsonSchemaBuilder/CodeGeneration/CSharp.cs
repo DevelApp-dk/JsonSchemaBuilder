@@ -21,17 +21,20 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         /// </summary>
         /// <param name="schema"></param>
         /// <returns></returns>
-        internal static (string fileName, string code) GenerateCode(string fileLocation, IJsonSchemaDefinition schema)
+        internal static (string fileName, string code) GenerateCode(string applicationRoot, IJsonSchemaDefinition schema)
         {
-            string fileName = fileLocation + FILE_ENDING;
+            string fileName = Path.Combine(applicationRoot, schema.Module.ToFilePath, schema.Name + FILE_ENDING);
 
-            CSharp cSharp = new CSharp(schema.Module);
+            CSharp cSharp = new CSharp(applicationRoot, schema.Module);
             return (fileName, cSharp.GenerateCode(schema.JsonSchemaBuilderSchema));
         }
 
         private NamespaceString _startNameSpace;
-        private CSharp(NamespaceString startNameSpace)
+        private string _applicationRoot;
+
+        private CSharp(string applicationRoot, NamespaceString startNameSpace)
         {
+            _applicationRoot = applicationRoot;
             _startNameSpace = startNameSpace;
         }
 
@@ -94,7 +97,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             {
                 case JsonSchemaBuilderPartType.Array:
                     JsonSchemaBuilderArray jsonSchemaBuilderArray = value as JsonSchemaBuilderArray;
-                    if(jsonSchemaBuilderArray.Enums != null && jsonSchemaBuilderArray.Enums.Count > 0)
+                    if (jsonSchemaBuilderArray.Enums != null && jsonSchemaBuilderArray.Enums.Count > 0)
                     {
                         GenerateEnumArray(codeBuilder, key, jsonSchemaBuilderArray);
                     }
@@ -104,7 +107,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     break;
                 case JsonSchemaBuilderPartType.Boolean:
-                        JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean = value as JsonSchemaBuilderBoolean;
+                    JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean = value as JsonSchemaBuilderBoolean;
                     if (jsonSchemaBuilderBoolean.Enums != null && jsonSchemaBuilderBoolean.Enums.Count > 0)
                     {
                         GenerateEnumBoolean(codeBuilder, key, jsonSchemaBuilderBoolean);
@@ -119,7 +122,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.Date:
                     JsonSchemaBuilderDate jsonSchemaBuilderDate = value as JsonSchemaBuilderDate;
-                    if(jsonSchemaBuilderDate.Enums != null && jsonSchemaBuilderDate.Enums.Count > 0)
+                    if (jsonSchemaBuilderDate.Enums != null && jsonSchemaBuilderDate.Enums.Count > 0)
                     {
                         GenerateEnumDate(codeBuilder, key, jsonSchemaBuilderDate);
                     }
@@ -130,7 +133,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.DateTime:
                     JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime = value as JsonSchemaBuilderDateTime;
-                    if(jsonSchemaBuilderDateTime.Enums != null && jsonSchemaBuilderDateTime.Enums.Count > 0)
+                    if (jsonSchemaBuilderDateTime.Enums != null && jsonSchemaBuilderDateTime.Enums.Count > 0)
                     {
                         GenerateEnumDateTime(codeBuilder, key, jsonSchemaBuilderDateTime);
                     }
@@ -144,7 +147,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.Email:
                     JsonSchemaBuilderEmail jsonSchemaBuilderEmail = value as JsonSchemaBuilderEmail;
-                    if(jsonSchemaBuilderEmail.Enums != null && jsonSchemaBuilderEmail.Enums.Count > 0)
+                    if (jsonSchemaBuilderEmail.Enums != null && jsonSchemaBuilderEmail.Enums.Count > 0)
                     {
                         GenerateEnumEmail(codeBuilder, key, jsonSchemaBuilderEmail);
                     }
@@ -155,7 +158,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.Integer:
                     JsonSchemaBuilderInteger jsonSchemaBuilderInteger = value as JsonSchemaBuilderInteger;
-                    if(jsonSchemaBuilderInteger.Enums != null && jsonSchemaBuilderInteger.Enums.Count > 0)
+                    if (jsonSchemaBuilderInteger.Enums != null && jsonSchemaBuilderInteger.Enums.Count > 0)
                     {
                         GenerateEnumInteger(codeBuilder, key, jsonSchemaBuilderInteger);
                     }
@@ -169,7 +172,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.Number:
                     JsonSchemaBuilderNumber jsonSchemaBuilderNumber = value as JsonSchemaBuilderNumber;
-                    if(jsonSchemaBuilderNumber.Enums != null && jsonSchemaBuilderNumber.Enums.Count > 0)
+                    if (jsonSchemaBuilderNumber.Enums != null && jsonSchemaBuilderNumber.Enums.Count > 0)
                     {
                         GenerateEnumNumber(codeBuilder, key, jsonSchemaBuilderNumber);
                     }
@@ -183,7 +186,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.Object:
                     JsonSchemaBuilderObject jsonSchemaBuilderObject = value as JsonSchemaBuilderObject;
-                    if(jsonSchemaBuilderObject.Enums != null && jsonSchemaBuilderObject.Enums.Count > 0)
+                    if (jsonSchemaBuilderObject.Enums != null && jsonSchemaBuilderObject.Enums.Count > 0)
                     {
                         GenerateEnumObject(codeBuilder, key, jsonSchemaBuilderObject, definitions);
                     }
@@ -194,7 +197,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.String:
                     JsonSchemaBuilderString jsonSchemaBuilderString = value as JsonSchemaBuilderString;
-                    if(jsonSchemaBuilderString.Enums != null && jsonSchemaBuilderString.Enums.Count > 0)
+                    if (jsonSchemaBuilderString.Enums != null && jsonSchemaBuilderString.Enums.Count > 0)
                     {
                         GenerateEnumString(codeBuilder, key, jsonSchemaBuilderString);
                     }
@@ -205,7 +208,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JsonSchemaBuilderPartType.Time:
                     JsonSchemaBuilderTime jsonSchemaBuilderTime = value as JsonSchemaBuilderTime;
-                    if(jsonSchemaBuilderTime.Enums != null && jsonSchemaBuilderTime.Enums.Count > 0)
+                    if (jsonSchemaBuilderTime.Enums != null && jsonSchemaBuilderTime.Enums.Count > 0)
                     {
                         GenerateEnumTime(codeBuilder, key, jsonSchemaBuilderTime);
                     }
@@ -214,16 +217,10 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         GenerateOrdinaryTime(codeBuilder, key, jsonSchemaBuilderTime);
                     }
                     break;
-                case JsonSchemaBuilderPartType.UriReference:
-                    JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference = value as JsonSchemaBuilderUriReference;
-                    if(jsonSchemaBuilderUriReference.Enums != null && jsonSchemaBuilderUriReference.Enums.Count > 0)
-                    {
-                        GenerateEnumUriReference(codeBuilder, key, jsonSchemaBuilderUriReference);
-                    }
-                    else
-                    {
-                        GenerateOrdinaryUriReference(codeBuilder, key, jsonSchemaBuilderUriReference);
-                    }
+                case JsonSchemaBuilderPartType.IriReference:
+                    JsonSchemaBuilderIriReference jsonSchemaBuilderUriReference = value as JsonSchemaBuilderIriReference;
+                    //Reference cannot be an enum
+                    GenerateOrdinaryUriReference(codeBuilder, key, jsonSchemaBuilderUriReference);
                     break;
                 default:
                     codeBuilder.L($"throw new NotImplementedException(\"PartType {value.PartType} is not implemented\");");
@@ -516,74 +513,54 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Uri Reference
 
-        private void GenerateEnumUriReference(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void GenerateOrdinaryUriReference(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference)
+        private void GenerateOrdinaryUriReference(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderIriReference jsonSchemaBuilderIriReference)
         {
             try
             {
-                if (Uri.TryCreate(jsonSchemaBuilderUriReference.LocalFileLocation, UriKind.RelativeOrAbsolute, out Uri uri))
+                //Search for the schema file as .schema.json and .json and load it when found
+                string schemaString = string.Empty;
+                string relativeLocalFileWithExpandedDot = jsonSchemaBuilderIriReference.RelativeLocalFile;
+                if (relativeLocalFileWithExpandedDot.StartsWith("./") || relativeLocalFileWithExpandedDot.StartsWith(".\\"))
                 {
-                    if (uri.IsLoopback && uri.IsFile)
+                    relativeLocalFileWithExpandedDot = Path.Combine(_startNameSpace.ToFilePath, relativeLocalFileWithExpandedDot.Remove(0, 2));
+                }
+
+                string localfile = Path.Combine(_applicationRoot, relativeLocalFileWithExpandedDot);
+                if (File.Exists(localfile))
+                {
+                    schemaString = File.ReadAllText(localfile);
+                }
+                else
+                {
+                    throw new CodeGenerationException($"Schema could not be found at the path {localfile}");
+                }
+
+                // make a schema and generate code from that
+                JsonValue jsonValueOfSchema = JsonValue.Parse(schemaString);
+                if (string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment) ||
+                    jsonSchemaBuilderIriReference.Fragment.Equals("/"))
+                {
+                    //Process schema Json
+                    GenerateCodeFromSchema(codeBuilder, jsonValueOfSchema, key, jsonSchemaBuilderIriReference);
+                }
+                else if (jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
+                {
+                    JsonSerializer jsonSerializer = new JsonSerializer();
+                    JsonSchema jsonSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValueOfSchema);
+                    string afterDefinitions = jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().Replace("/definitions/", "");
+                    if (jsonSchema.Definitions() != null && jsonSchema.Definitions().TryGetValue(afterDefinitions, out JsonSchema subSchema))
                     {
-                        //Search for the schema file as .schema.json and .json and load it when found
-                        string pathAndFileString = uri.LocalPath;
-                        string schemaString = string.Empty;
-                        if (File.Exists(pathAndFileString))
-                        {
-                            schemaString = File.ReadAllText(pathAndFileString);
-                        }
-                        else if (File.Exists(pathAndFileString + ".schema.json"))
-                        {
-                            schemaString = File.ReadAllText(pathAndFileString + ".schema.json");
-                        }
-                        else if (File.Exists(pathAndFileString + ".json"))
-                        {
-                            schemaString = File.ReadAllText(pathAndFileString + ".json");
-                        }
-                        else
-                        {
-                            throw new CodeGenerationException($"Schema could not be found at the path {pathAndFileString}");
-                        }
-                        // make a schema and generate code from that
-                        JsonValue jsonValueOfSchema = JsonValue.Parse(schemaString);
-                        if(string.IsNullOrWhiteSpace(jsonSchemaBuilderUriReference.ObjectReference) ||
-                            jsonSchemaBuilderUriReference.ObjectReference.Equals("/"))
-                        {
-                            //Process schema Json
-                            GenerateCodeFromSchema(codeBuilder, jsonValueOfSchema, key, jsonSchemaBuilderUriReference);
-                        }
-                        else if(jsonSchemaBuilderUriReference.ObjectReference.ToLowerInvariant().StartsWith("/definitions/"))
-                        {
-                            JsonSerializer jsonSerializer = new JsonSerializer();
-                            JsonSchema jsonSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValueOfSchema);
-                            string afterDefinitions = jsonSchemaBuilderUriReference.ObjectReference.ToLowerInvariant().Replace("/definitions/", "");
-                            if(jsonSchema.Definitions() != null && jsonSchema.Definitions().TryGetValue(afterDefinitions, out JsonSchema subSchema))
-                            {
-                                //Process subschema Json
-                                GenerateCodeFromSchema(codeBuilder, subSchema.ToJson(jsonSerializer), key, jsonSchemaBuilderUriReference);
-                            }
-                            else
-                            {
-                                throw new CodeGenerationException($"Could not find {afterDefinitions} in the definitions of the schema");
-                            }
-                        }
-                        else
-                        {
-                            throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
-                        }
+                        //Process subschema Json
+                        GenerateCodeFromSchema(codeBuilder, subSchema.ToJson(jsonSerializer), key, jsonSchemaBuilderIriReference);
                     }
                     else
                     {
-                        throw new NotImplementedException($"Uri {uri} is not supported");
+                        throw new CodeGenerationException($"Could not find {afterDefinitions} in the definitions of the schema");
                     }
                 }
                 else
                 {
-                    throw new CodeGenerationException($"{nameof(jsonSchemaBuilderUriReference.LocalFileLocation)} provides a invalid Uri");
+                    throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
                 }
             }
             catch (CodeGenerationException)
@@ -596,7 +573,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private void GenerateCodeFromSchema(CodeBuilder codeBuilder, JsonValue jsonValueOfSchema, IdentifierString key, JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference)
+        private void GenerateCodeFromSchema(CodeBuilder codeBuilder, JsonValue jsonValueOfSchema, IdentifierString key, JsonSchemaBuilderIriReference jsonSchemaBuilderUriReference)
         {
             if (jsonValueOfSchema.Type == JsonValueType.Object)
             {
@@ -782,7 +759,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderUriReference jsonSchemaBuilderUriReference)
+        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderIriReference jsonSchemaBuilderUriReference)
         {
             if(jsonSchemaBuilderUriReference.DefaultValue != null)
             {

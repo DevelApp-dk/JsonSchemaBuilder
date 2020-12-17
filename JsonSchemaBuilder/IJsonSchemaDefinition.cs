@@ -43,13 +43,13 @@ namespace DevelApp.JsonSchemaBuilder
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        (string fileName, string code) GenerateCode(Code code);
+        (string fileName, string code) GenerateCode(Code code, string applicationRoot);
 
         /// <summary>
         /// Generate code to a path
         /// </summary>
         /// <param name="code"></param>
         /// <param name="filePathBeforeModuleNamespace"></param>
-        void GenerateCode(Code code, string filePathBeforeModuleNamespace);
+        void GenerateCodeToFile(Code code, string applicationRoot);
     }
 }
