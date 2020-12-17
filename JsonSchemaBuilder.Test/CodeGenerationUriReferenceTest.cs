@@ -14,12 +14,12 @@ namespace JsonSchemaBuilder.Test
         //[Fact]
         //public void UriReferenceAsTopPart()
         //{
-        //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
+        //    string applicationRoot = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
         //    IJsonSchemaDefinition jsonSchemaDefinition = new UriReferenceAsTopPartJsonSchema();
-        //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
-        //    CodeGenerator codeGenerator = new CodeGenerator();
-        //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
+        //    jsonSchemaDefinition.WriteSchemaToFile(applicationRoot);
+        //    CodeGenerator codeGenerator = new CodeGenerator(applicationRoot);
+        //    codeGenerator.GenerateToFile(Code.CSharp, jsonSchemaDefinition);
         //}
     }
 
@@ -44,10 +44,17 @@ namespace JsonSchemaBuilder.Test
 
         protected override JsonSchemaBuilderSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderUriReference uriReferencePart = new JsonSchemaBuilderUriReference("MyTopPartUriReference", "TopPart",
-                localFileLocation:"file:///E:/Projects/JsonSchemaBuilder/ModelTest/Funny/Onion/dateAsTopPart",objectReference: "#/");
+            if (Uri.TryCreate("./dateAsTopPart", UriKind.RelativeOrAbsolute, out Uri uri))
+            {
 
-            return new JsonSchemaBuilderSchema("UriReferencesATopPart", Description, topPart: uriReferencePart);
+                JsonSchemaBuilderIriReference uriReferencePart = new JsonSchemaBuilderIriReference("MyTopPartUriReference", "TopPart", iriReference: uri);
+
+                return new JsonSchemaBuilderSchema("UriReferencesATopPart", Description, topPart: uriReferencePart);
+            }
+            else
+            {
+                throw new Exception("Uri not valid");
+            }
         }
     }
 }

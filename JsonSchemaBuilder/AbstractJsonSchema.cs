@@ -72,16 +72,23 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Write schema to file
         /// </summary>
-        /// <param name="filePathBeforeNamespace"></param>
-        public void WriteSchemaToFile(string filePathBeforeNamespace)
+        /// <param name="applicationRoot"></param>
+        public void WriteSchemaToFile(string applicationRoot)
         {
             var serializer = new JsonSerializer();
             if (JsonSchema != null)
             {
                 var schemaInJson = JsonSchema.ToJson(serializer);
-                string fileName = Path.Combine(Module.ToFilePath,TransformToCorrectCase(Name) + FILE_ENDING);
+                string fileName = Path.Combine(Module.ToFilePath,TransformToCamelCase(Name) + FILE_ENDING);
+                string localFile = Path.Combine(applicationRoot, fileName);
+                FileInfo fileInfo = new FileInfo(localFile);
+                string directory = fileInfo.Directory.FullName;
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
 
-                File.WriteAllText(Path.Combine(filePathBeforeNamespace, fileName), schemaInJson.GetIndentedString());
+                File.WriteAllText(localFile, schemaInJson.GetIndentedString());
             }
             else
             {
@@ -89,18 +96,9 @@ namespace DevelApp.JsonSchemaBuilder
             }
         }
 
-        private CodeGenerator _generateCode;
-
-        private CodeGenerator CodeGeneration
+        private CodeGenerator CodeGeneration(string applicationRoot)
         {
-            get
-            {
-                if(_generateCode == null)
-                {
-                    _generateCode = new CodeGenerator();
-                }
-                return _generateCode;
-            }
+            return new CodeGenerator(applicationRoot);
         }
 
         /// <summary>
@@ -108,19 +106,19 @@ namespace DevelApp.JsonSchemaBuilder
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        public (string fileName, string code) GenerateCode(Code code)
+        public (string fileName, string code) GenerateCode(Code code, string applicationRoot)
         {
-            return CodeGeneration.Generate(code, this);
+            return CodeGeneration(applicationRoot).Generate(code, this);
         }
 
         /// <summary>
         /// Generate code to a path
         /// </summary>
         /// <param name="code"></param>
-        /// <param name="filePathBeforeModuleNamespace"></param>
-        public void GenerateCode(Code code, string filePathBeforeModuleNamespace)
+        /// <param name="applicationRoot"></param>
+        public void GenerateCodeToFile(Code code, string applicationRoot)
         {
-            CodeGeneration.Generate(code, this, filePathBeforeModuleNamespace);
+            CodeGeneration(applicationRoot).GenerateToFile(code, this);
         }
 
         #endregion
@@ -167,7 +165,7 @@ namespace DevelApp.JsonSchemaBuilder
         #endregion
 
 
-        private string TransformToCorrectCase(string stringToTransform)
+        private string TransformToCamelCase(string stringToTransform)
         {
             return stringToTransform.Substring(0, 1).ToLowerInvariant() + stringToTransform.Substring(1);
         }

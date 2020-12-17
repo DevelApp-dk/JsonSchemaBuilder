@@ -15,7 +15,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         Number = 7,
         Boolean = 8,
         Email = 11,
-        UriReference = 12,
+        IriReference = 12,
         Schema = 13,
         Time = 14
     }

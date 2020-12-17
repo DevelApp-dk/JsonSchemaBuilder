@@ -14,12 +14,12 @@ namespace JsonSchemaBuilder.Test
         //[Fact]
         //public void DateAsTopPart()
         //{
-        //    string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
+        //    string applicationRoot = "E:\\\\Projects\\JsonSchemaBuilder\\ModelTest\\";
 
         //    IJsonSchemaDefinition jsonSchemaDefinition = new DateAsTopPartJsonSchema();
-        //    jsonSchemaDefinition.WriteSchemaToFile(pathString);
-        //    CodeGenerator codeGenerator = new CodeGenerator();
-        //    codeGenerator.Generate(Code.CSharp, jsonSchemaDefinition, pathString);
+        //    jsonSchemaDefinition.WriteSchemaToFile(applicationRoot);
+        //    CodeGenerator codeGenerator = new CodeGenerator(applicationRoot);
+        //    codeGenerator.GenerateToFile(Code.CSharp, jsonSchemaDefinition);
         //}
     }
 
