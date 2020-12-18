@@ -10,7 +10,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// </summary>
     public class JsonSchemaBuilderNumber : AbstractJsonSchemaBuilderPart<double?>
     {
-        public JsonSchemaBuilderNumber(IdentifierString objectName, string description, double? minimum, double? maximum, 
+        public JsonSchemaBuilderNumber(IdentifierString objectName, string description, double? minimum = null, double? maximum = null, 
             double? multipleOf = null, double? defaultValue = null, List<double?> examples = null,
             List<double?> enums = null, bool isRequired = false)
             : base(objectName, description, isRequired, defaultValue: defaultValue, examples: examples, enums: enums)
