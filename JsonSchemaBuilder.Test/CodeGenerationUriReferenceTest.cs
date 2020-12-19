@@ -42,14 +42,14 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
             if (Uri.TryCreate("./dateAsTopPart", UriKind.RelativeOrAbsolute, out Uri uri))
             {
 
-                JsonSchemaBuilderIriReference uriReferencePart = new JsonSchemaBuilderIriReference("MyTopPartUriReference", "TopPart", iriReference: uri);
+                JSBRef uriReferencePart = new JSBRef("MyTopPartUriReference", "TopPart", iriReference: uri);
 
-                return new JsonSchemaBuilderSchema("UriReferencesATopPart", Description, topPart: uriReferencePart);
+                return new JSBSchema("UriReferencesATopPart", Description, topPart: uriReferencePart);
             }
             else
             {

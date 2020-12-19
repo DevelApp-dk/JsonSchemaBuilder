@@ -8,9 +8,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience integer definition in Json Schema.
     /// </summary>
-    public class JsonSchemaBuilderInteger : AbstractJsonSchemaBuilderPart<long?>
+    public class JSBInteger : AbstractJSBPart<long?>
     {
-        public JsonSchemaBuilderInteger(IdentifierString objectName, string description, long? minimum = null, 
+        public JSBInteger(IdentifierString objectName, string description, long? minimum = null, 
             long? maximum = null, double? multipleOf = null, long? defaultValue = null, List<long?> examples = null, 
             List<long?> enums = null, bool isRequired = false) 
             : base(objectName, description, isRequired, defaultValue:defaultValue, examples:examples, enums:enums)
@@ -47,11 +47,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         public long? Minimum { get; }
         public long? Maximum { get; }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Integer;
+                return JSBPartType.Integer;
             }
         }
 

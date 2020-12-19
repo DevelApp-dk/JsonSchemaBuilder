@@ -8,20 +8,19 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Defines JsonSchema object
     /// </summary>
-    public class JsonSchemaBuilderObject : AbstractJsonSchemaBuilderPart<JsonValue>
+    public class JSBObject : AbstractJSBPart<JsonValue>
     {
-        public JsonSchemaBuilderObject(IdentifierString objectName, string description, 
-            Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = null, bool isRequired = false, 
+        public JSBObject(IdentifierString objectName, string description, 
+            List<IJSBPart> props = null, bool isRequired = false, 
             JsonValue defaultValue = null, List<JsonValue> examples = null, List<JsonValue> enums = null, bool isExpandable = false)
             : base(objectName, description, isRequired, defaultValue: defaultValue, examples: examples, enums: enums)
         {
-            if (properties != null)
+            if (props != null)
             {
-                Properties = properties;
-            }
-            else
-            {
-                Properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
+                foreach(IJSBPart part in props)
+                {
+                    Properties.Add(part.Name, part);
+                }
             }
             IsExpandable = isExpandable;
         }
@@ -29,18 +28,18 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         /// <summary>
         /// Stores the properties as children
         /// </summary>
-        public Dictionary<IdentifierString, IJsonSchemaBuilderPart> Properties { get; }
+        public Dictionary<IdentifierString, IJSBPart> Properties { get; } = new Dictionary<IdentifierString, IJSBPart>();
 
         /// <summary>
         /// Can the object be extended with outher properties
         /// </summary>
         public bool IsExpandable { get; }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Object;
+                return JSBPartType.Object;
             }
         }
 
@@ -50,13 +49,13 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
                 .Type(JsonSchemaType.Object)
                 .AdditionalProperties(IsExpandable);
             //Add properties
-            foreach (IJsonSchemaBuilderPart property in Properties.Values)
+            foreach (IJSBPart property in Properties.Values)
             {
                 returnSchema.Property(StartWithSmallLetter(property.Name), property.AsJsonSchema());
             }
             //Add required
             List<string> requiredNames = new List<string>();
-            foreach (IJsonSchemaBuilderPart property in Properties.Values)
+            foreach (IJSBPart property in Properties.Values)
             {
                 if (property.IsRequired)
                 {

@@ -5,9 +5,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Comvinience email definition in Json Schema.
     /// </summary>
-    public class JsonSchemaBuilderEmail : JsonSchemaBuilderString
+    public class JSBEmail : JSBString
     {
-        public JsonSchemaBuilderEmail(
+        public JSBEmail(
                 IdentifierString emailName,
                 string description,
                 string defaultValue = null,
@@ -21,11 +21,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         {
         }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Email;
+                return JSBPartType.Email;
             }
         }
     }

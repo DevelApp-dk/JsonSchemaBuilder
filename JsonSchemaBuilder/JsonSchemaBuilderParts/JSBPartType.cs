@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public enum JsonSchemaBuilderPartType
+    public enum JSBPartType
     {
         Object = 1,
         String = 2,

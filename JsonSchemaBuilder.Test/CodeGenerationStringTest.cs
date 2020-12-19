@@ -42,11 +42,11 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPartString", "TopPart");
+            JSBString stringPart = new JSBString("MyTopPartString", "TopPart");
 
-            return new JsonSchemaBuilderSchema("StringAsATopPart", Description, topPart: stringPart);
+            return new JSBSchema("StringAsATopPart", Description, topPart: stringPart);
         }
     }
 }

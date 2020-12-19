@@ -42,11 +42,11 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderEmail emailPart = new JsonSchemaBuilderEmail("MyTopPartEmail", "TopPart", defaultValue:"riger@support.com");
+            JSBEmail emailPart = new JSBEmail("MyTopPartEmail", "TopPart", defaultValue:"riger@support.com");
 
-            return new JsonSchemaBuilderSchema("EmailAsATopPart", Description, topPart: emailPart);
+            return new JSBSchema("EmailAsATopPart", Description, topPart: emailPart);
         }
     }
 }

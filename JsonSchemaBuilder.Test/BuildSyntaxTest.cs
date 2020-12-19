@@ -12,13 +12,13 @@ namespace JsonSchemaBuilder.Test
         [Fact]
         public void BuildObject()
         {
-            Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
+            List<IJSBPart> properties = new List<IJSBPart>();
             string objectName = "ObjectName";
             string description = "ObjectDescription";
             bool isRequired = false;
             bool isExpandable = false;
 
-            var varObject = new JsonSchemaBuilderObject(objectName, description, properties, isRequired: isRequired, isExpandable: isExpandable);
+            var varObject = new JSBObject(objectName, description, properties, isRequired: isRequired, isExpandable: isExpandable);
             JsonSchema varSchema = varObject.AsJsonSchema();
         }
 
@@ -30,7 +30,7 @@ namespace JsonSchemaBuilder.Test
             bool? defaultValue = true;
             bool isRequired = false;
 
-            var varBoolean = new JsonSchemaBuilderBoolean(objectName, description, defaultValue, isRequired);
+            var varBoolean = new JSBBoolean(objectName, description, defaultValue, isRequired);
 
             JsonSchema varSchema = varBoolean.AsJsonSchema();
         }
@@ -52,7 +52,7 @@ namespace JsonSchemaBuilder.Test
             uint maxLength = 8;
             string pattern = "fau";
 
-            var varString = new JsonSchemaBuilderString(objectName, description, minLength:minLength, 
+            var varString = new JSBString(objectName, description, minLength:minLength, 
                 maxLength:maxLength, pattern: pattern, defaultValue: defaultValue, isRequired: isRequired);
 
             JsonSchema varSchema = varString.AsJsonSchema();

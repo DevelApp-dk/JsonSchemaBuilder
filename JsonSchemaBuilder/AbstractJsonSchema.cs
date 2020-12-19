@@ -56,7 +56,7 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Returns JsonSchemaBuilderSchema for extending
         /// </summary>
-        public JsonSchemaBuilderSchema JsonSchemaBuilderSchema { get; }
+        public JSBSchema JsonSchemaBuilderSchema { get; }
 
         /// <summary>
         /// Name of the class without JsonSchema if existing
@@ -139,16 +139,16 @@ namespace DevelApp.JsonSchemaBuilder
         /// Main function. Used to build JsonSchemaBuilder from JsonSchema
         /// </summary>
         /// <returns></returns>
-        protected JsonSchemaBuilderSchema BuildJsonSchema(JsonSchema jsonSchema)
+        protected JSBSchema BuildJsonSchema(JsonSchema jsonSchema)
         {
-            return JsonSchemaBuilderSchema.BuildSchema(jsonSchema);
+            return JSBSchema.BuildSchema(jsonSchema);
         }
 
         /// <summary>
         /// Main function. Used to build JsonSchema from JsonSchemaParts
         /// </summary>
         /// <returns></returns>
-        protected virtual JsonSchemaBuilderSchema BuildJsonSchema(JsonValue jsonValue)
+        protected virtual JSBSchema BuildJsonSchema(JsonValue jsonValue)
         {
             JsonSerializer jsonSerializer = new JsonSerializer();
             JsonSchema deserializedSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValue);
@@ -160,7 +160,7 @@ namespace DevelApp.JsonSchemaBuilder
         /// if JsonSchema or JsonValue is not supplied to constructor
         /// </summary>
         /// <returns></returns>
-        protected abstract JsonSchemaBuilderSchema BuildJsonSchema();
+        protected abstract JSBSchema BuildJsonSchema();
 
         #endregion
 

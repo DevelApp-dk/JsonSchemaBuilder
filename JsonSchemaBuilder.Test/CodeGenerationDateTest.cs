@@ -42,11 +42,11 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderDate datePart = new JsonSchemaBuilderDate("MyTopPartDate", "TopPart", defaultValue: new DateTime(2015, 05, 16));
+            JSBDate datePart = new JSBDate("MyTopPartDate", "TopPart", defaultValue: new DateTime(2015, 05, 16));
 
-            return new JsonSchemaBuilderSchema("DateAsATopPart", Description, topPart: datePart);
+            return new JSBSchema("DateAsATopPart", Description, topPart: datePart);
         }
     }
 }

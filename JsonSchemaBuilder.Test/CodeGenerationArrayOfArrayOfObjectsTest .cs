@@ -41,26 +41,26 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderBoolean booleanPart = new JsonSchemaBuilderBoolean("BooleanPart", "BooleanPart for testing", isRequired: true);
-            JsonSchemaBuilderInteger integerPart = new JsonSchemaBuilderInteger("IntegerPart", "IntegerPart for testing");
+            JSBBoolean booleanPart = new JSBBoolean("BooleanPart", "BooleanPart for testing", isRequired: true);
+            JSBInteger integerPart = new JSBInteger("IntegerPart", "IntegerPart for testing");
 
-            Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
-            properties.Add(booleanPart.Name, booleanPart);
-            properties.Add(integerPart.Name, integerPart);
+            List<IJSBPart> properties = new List<IJSBPart>();
+            properties.Add(booleanPart);
+            properties.Add(integerPart);
 
-            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("ObjectInAnArrayOfAnArray", "ObjectInAnArrayOfAnArray is fun", properties: properties);
+            JSBObject objectPart = new JSBObject("ObjectInAnArrayOfAnArray", "ObjectInAnArrayOfAnArray is fun", props: properties);
 
-            List<IJsonSchemaBuilderPart> innerItems = new List<IJsonSchemaBuilderPart>();
+            List<IJSBPart> innerItems = new List<IJSBPart>();
             innerItems.Add(objectPart);
-            JsonSchemaBuilderArray innerArrayPart = new JsonSchemaBuilderArray("InnerArray", "InnerArrayPart", innerItems);
+            JSBArray innerArrayPart = new JSBArray("InnerArray", "InnerArrayPart", innerItems);
 
-            List<IJsonSchemaBuilderPart> items = new List<IJsonSchemaBuilderPart>();
+            List<IJSBPart> items = new List<IJSBPart>();
             items.Add(innerArrayPart);
-            JsonSchemaBuilderArray arrayPart = new JsonSchemaBuilderArray("MyTopPartArrayOfArray", "TopPart", items);
+            JSBArray arrayPart = new JSBArray("MyTopPartArrayOfArray", "TopPart", items);
 
-            return new JsonSchemaBuilderSchema("ArrayOfObjectsAsATopPart", Description, topPart: arrayPart);
+            return new JSBSchema("ArrayOfObjectsAsATopPart", Description, topPart: arrayPart);
         }
     }
 }

@@ -25,9 +25,9 @@ namespace DevelApp.JsonSchemaBuilder
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            return new JsonSchemaBuilderSchema(Name, Description);
+            return new JSBSchema(Name, Description);
         }
     }
 }
