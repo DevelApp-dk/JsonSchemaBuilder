@@ -9,9 +9,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Ordinary string and parent to all string format types ref http://json-schema.org/understanding-json-schema/reference/string.html
     /// </summary>
-    public class JsonSchemaBuilderString : AbstractJsonSchemaBuilderPart<string>
+    public class JSBString : AbstractJSBPart<string>
     {
-        public JsonSchemaBuilderString(IdentifierString stringName, string description, string format = null, uint minLength = 0, 
+        public JSBString(IdentifierString stringName, string description, string format = null, uint minLength = 0, 
             uint? maxLength = null, string pattern = null, string defaultValue = null, List<string> examples = null, List<string> enums = null, bool isRequired = false) 
             : base(stringName, description, isRequired, defaultValue, examples, enums)
         {
@@ -38,11 +38,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public string Format { get; }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.String;
+                return JSBPartType.String;
             }
         }
 

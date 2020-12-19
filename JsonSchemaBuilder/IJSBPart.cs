@@ -4,7 +4,7 @@ using Manatee.Json.Schema;
 
 namespace DevelApp.JsonSchemaBuilder
 {
-    public interface IJsonSchemaBuilderPart
+    public interface IJSBPart
     {
         /// <summary>
         /// Name of the schema part
@@ -30,6 +30,6 @@ namespace DevelApp.JsonSchemaBuilder
         /// <summary>
         /// Returns the PartType of the JsonSchemaPart
         /// </summary>
-        JsonSchemaBuilderPartType PartType { get; }
+        JSBPartType PartType { get; }
     }
 }

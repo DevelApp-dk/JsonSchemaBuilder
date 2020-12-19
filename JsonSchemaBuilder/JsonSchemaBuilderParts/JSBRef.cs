@@ -12,9 +12,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// Add reference "$ref": "./xs.schema.json#/definitions/xs:decimal" with "./xs.schema.json" as the local file and 
     /// "#/definitions/xs:decimal" as fragment getting xs:decimal from the definition
     /// </summary>
-    public class JsonSchemaBuilderIriReference : AbstractJsonSchemaBuilderPart<string>
+    public class JSBRef : AbstractJSBPart<string>
     {
-        public JsonSchemaBuilderIriReference(IdentifierString referenceName, string description, Uri iriReference, 
+        public JSBRef(IdentifierString referenceName, string description, Uri iriReference, 
             string defaultValue = null, List<string> examples = null, List<string> enums = null, bool isRequired = false) 
             : base(referenceName, description, isRequired, defaultValue, examples, enums)
         {
@@ -102,11 +102,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         /// </summary>
         public Uri IriReference { get; }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.IriReference;
+                return JSBPartType.IriReference;
             }
         }
 

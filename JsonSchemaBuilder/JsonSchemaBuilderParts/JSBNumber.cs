@@ -8,9 +8,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience number definition in Json Schema.
     /// </summary>
-    public class JsonSchemaBuilderNumber : AbstractJsonSchemaBuilderPart<double?>
+    public class JSBNumber : AbstractJSBPart<double?>
     {
-        public JsonSchemaBuilderNumber(IdentifierString objectName, string description, double? minimum = null, double? maximum = null, 
+        public JSBNumber(IdentifierString objectName, string description, double? minimum = null, double? maximum = null, 
             double? multipleOf = null, double? defaultValue = null, List<double?> examples = null,
             List<double?> enums = null, bool isRequired = false)
             : base(objectName, description, isRequired, defaultValue: defaultValue, examples: examples, enums: enums)
@@ -47,11 +47,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         public double? Minimum { get; }
         public double? Maximum { get; }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Number;
+                return JSBPartType.Number;
             }
         }
 

@@ -6,9 +6,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience date definition in Json Schema in yyyy-MM-dd format (ISO-8601 compatible)
     /// </summary>
-    public class JsonSchemaBuilderDate : JsonSchemaBuilderString
+    public class JSBDate : JSBString
     {
-        public JsonSchemaBuilderDate(
+        public JSBDate(
             IdentifierString dateName,
             string description,
             DateTime? defaultValue = null,
@@ -22,11 +22,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         {
         }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Date;
+                return JSBPartType.Date;
             }
         }
     }

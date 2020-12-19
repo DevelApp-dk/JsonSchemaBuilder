@@ -42,11 +42,11 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderString stringPart = new JsonSchemaBuilderString("MyTopPartString", "TopPart", enums: new List<string> { "Monster", "item", "Nusense"});
+            JSBString stringPart = new JSBString("MyTopPartString", "TopPart", enums: new List<string> { "Monster", "item", "Nusense"});
 
-            return new JsonSchemaBuilderSchema("StringEnumAsATopPart", Description, topPart: stringPart);
+            return new JSBSchema("StringEnumAsATopPart", Description, topPart: stringPart);
         }
     }
 }

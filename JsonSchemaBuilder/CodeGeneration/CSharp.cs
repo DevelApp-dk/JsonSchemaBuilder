@@ -43,20 +43,20 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         /// </summary>
         /// <param name="schema"></param>
         /// <returns></returns>
-        private string GenerateCode(JsonSchemaBuilderSchema schema)
+        private string GenerateCode(JSBSchema schema)
         {
             CodeBuilder codeBuilder = new CodeBuilder();
             GenerateStartOfSchema(codeBuilder, schema);
-            if (schema.TopPart.PartType == JsonSchemaBuilderPartType.Object)
+            if (schema.TopPart.PartType == JSBPartType.Object)
             {
                 GenerateCodeForBuilderPart(codeBuilder, schema.TopPart.Name, schema.TopPart, schema.Definitions);
             }
             else
             {
-                Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
-                properties.Add(schema.TopPart.Name, schema.TopPart);
+                List<IJSBPart> properties = new List<IJSBPart>();
+                properties.Add(schema.TopPart);
 
-                JsonSchemaBuilderObject encasingObject = new JsonSchemaBuilderObject(schema.Name, schema.Description, properties: properties);
+                JSBObject encasingObject = new JSBObject(schema.Name, schema.Description, props: properties);
                 GenerateCodeForBuilderPart(codeBuilder, schema.Name, encasingObject, schema.Definitions);
             }
             GenerateEndOfSchema(codeBuilder, schema);
@@ -68,7 +68,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         /// </summary>
         /// <param name="codeBuilder"></param>
         /// <param name="schema"></param>
-        private void GenerateStartOfSchema(CodeBuilder codeBuilder, JsonSchemaBuilderSchema schema)
+        private void GenerateStartOfSchema(CodeBuilder codeBuilder, JSBSchema schema)
         {
             //TODO run through schema children to get all references to make sure they are included
             codeBuilder
@@ -84,19 +84,19 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .IndentIncrease();
         }
 
-        private void GenerateEndOfSchema(CodeBuilder codeBuilder, JsonSchemaBuilderSchema schema)
+        private void GenerateEndOfSchema(CodeBuilder codeBuilder, JSBSchema schema)
         {
             codeBuilder
                 .IndentDecrease()
                 .L("}");
         }
 
-        private void GenerateCodeForBuilderPart(CodeBuilder codeBuilder, IdentifierString key, IJsonSchemaBuilderPart value, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, bool parentIsArray = false)
+        private void GenerateCodeForBuilderPart(CodeBuilder codeBuilder, IdentifierString key, IJSBPart value, Dictionary<IdentifierString, IJSBPart> definitions = null, bool parentIsArray = false)
         {
             switch (value.PartType)
             {
-                case JsonSchemaBuilderPartType.Array:
-                    JsonSchemaBuilderArray jsonSchemaBuilderArray = value as JsonSchemaBuilderArray;
+                case JSBPartType.Array:
+                    JSBArray jsonSchemaBuilderArray = value as JSBArray;
                     if (jsonSchemaBuilderArray.Enums != null && jsonSchemaBuilderArray.Enums.Count > 0)
                     {
                         GenerateEnumArray(codeBuilder, key, jsonSchemaBuilderArray);
@@ -106,8 +106,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         GenerateOrdinaryArray(codeBuilder, key, jsonSchemaBuilderArray);
                     }
                     break;
-                case JsonSchemaBuilderPartType.Boolean:
-                    JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean = value as JsonSchemaBuilderBoolean;
+                case JSBPartType.Boolean:
+                    JSBBoolean jsonSchemaBuilderBoolean = value as JSBBoolean;
                     if (jsonSchemaBuilderBoolean.Enums != null && jsonSchemaBuilderBoolean.Enums.Count > 0)
                     {
                         GenerateEnumBoolean(codeBuilder, key, jsonSchemaBuilderBoolean);
@@ -120,8 +120,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         }
                     }
                     break;
-                case JsonSchemaBuilderPartType.Date:
-                    JsonSchemaBuilderDate jsonSchemaBuilderDate = value as JsonSchemaBuilderDate;
+                case JSBPartType.Date:
+                    JSBDate jsonSchemaBuilderDate = value as JSBDate;
                     if (jsonSchemaBuilderDate.Enums != null && jsonSchemaBuilderDate.Enums.Count > 0)
                     {
                         GenerateEnumDate(codeBuilder, key, jsonSchemaBuilderDate);
@@ -131,8 +131,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         GenerateOrdinaryDate(codeBuilder, key, jsonSchemaBuilderDate);
                     }
                     break;
-                case JsonSchemaBuilderPartType.DateTime:
-                    JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime = value as JsonSchemaBuilderDateTime;
+                case JSBPartType.DateTime:
+                    JSBDateTime jsonSchemaBuilderDateTime = value as JSBDateTime;
                     if (jsonSchemaBuilderDateTime.Enums != null && jsonSchemaBuilderDateTime.Enums.Count > 0)
                     {
                         GenerateEnumDateTime(codeBuilder, key, jsonSchemaBuilderDateTime);
@@ -145,8 +145,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         }
                     }
                     break;
-                case JsonSchemaBuilderPartType.Email:
-                    JsonSchemaBuilderEmail jsonSchemaBuilderEmail = value as JsonSchemaBuilderEmail;
+                case JSBPartType.Email:
+                    JSBEmail jsonSchemaBuilderEmail = value as JSBEmail;
                     if (jsonSchemaBuilderEmail.Enums != null && jsonSchemaBuilderEmail.Enums.Count > 0)
                     {
                         GenerateEnumEmail(codeBuilder, key, jsonSchemaBuilderEmail);
@@ -156,8 +156,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         GenerateOrdinaryEmail(codeBuilder, key, jsonSchemaBuilderEmail);
                     }
                     break;
-                case JsonSchemaBuilderPartType.Integer:
-                    JsonSchemaBuilderInteger jsonSchemaBuilderInteger = value as JsonSchemaBuilderInteger;
+                case JSBPartType.Integer:
+                    JSBInteger jsonSchemaBuilderInteger = value as JSBInteger;
                     if (jsonSchemaBuilderInteger.Enums != null && jsonSchemaBuilderInteger.Enums.Count > 0)
                     {
                         GenerateEnumInteger(codeBuilder, key, jsonSchemaBuilderInteger);
@@ -170,8 +170,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         }
                     }
                     break;
-                case JsonSchemaBuilderPartType.Number:
-                    JsonSchemaBuilderNumber jsonSchemaBuilderNumber = value as JsonSchemaBuilderNumber;
+                case JSBPartType.Number:
+                    JSBNumber jsonSchemaBuilderNumber = value as JSBNumber;
                     if (jsonSchemaBuilderNumber.Enums != null && jsonSchemaBuilderNumber.Enums.Count > 0)
                     {
                         GenerateEnumNumber(codeBuilder, key, jsonSchemaBuilderNumber);
@@ -184,8 +184,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         }
                     }
                     break;
-                case JsonSchemaBuilderPartType.Object:
-                    JsonSchemaBuilderObject jsonSchemaBuilderObject = value as JsonSchemaBuilderObject;
+                case JSBPartType.Object:
+                    JSBObject jsonSchemaBuilderObject = value as JSBObject;
                     if (jsonSchemaBuilderObject.Enums != null && jsonSchemaBuilderObject.Enums.Count > 0)
                     {
                         GenerateEnumObject(codeBuilder, key, jsonSchemaBuilderObject, definitions);
@@ -195,8 +195,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         GenerateOrdinaryObject(codeBuilder, key, jsonSchemaBuilderObject, definitions, parentIsArray);
                     }
                     break;
-                case JsonSchemaBuilderPartType.String:
-                    JsonSchemaBuilderString jsonSchemaBuilderString = value as JsonSchemaBuilderString;
+                case JSBPartType.String:
+                    JSBString jsonSchemaBuilderString = value as JSBString;
                     if (jsonSchemaBuilderString.Enums != null && jsonSchemaBuilderString.Enums.Count > 0)
                     {
                         GenerateEnumString(codeBuilder, key, jsonSchemaBuilderString);
@@ -206,8 +206,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         GenerateOrdinaryString(codeBuilder, key, jsonSchemaBuilderString);
                     }
                     break;
-                case JsonSchemaBuilderPartType.Time:
-                    JsonSchemaBuilderTime jsonSchemaBuilderTime = value as JsonSchemaBuilderTime;
+                case JSBPartType.Time:
+                    JSBTime jsonSchemaBuilderTime = value as JSBTime;
                     if (jsonSchemaBuilderTime.Enums != null && jsonSchemaBuilderTime.Enums.Count > 0)
                     {
                         GenerateEnumTime(codeBuilder, key, jsonSchemaBuilderTime);
@@ -217,8 +217,8 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         GenerateOrdinaryTime(codeBuilder, key, jsonSchemaBuilderTime);
                     }
                     break;
-                case JsonSchemaBuilderPartType.IriReference:
-                    JsonSchemaBuilderIriReference jsonSchemaBuilderUriReference = value as JsonSchemaBuilderIriReference;
+                case JSBPartType.IriReference:
+                    JSBRef jsonSchemaBuilderUriReference = value as JSBRef;
                     //Reference cannot be an enum
                     GenerateOrdinaryUriReference(codeBuilder, key, jsonSchemaBuilderUriReference);
                     break;
@@ -230,14 +230,14 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Array
 
-        private void GenerateEnumArray(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderArray jsonSchemaBuilderArray)
+        private void GenerateEnumArray(CodeBuilder codeBuilder, IdentifierString key, JSBArray jsonSchemaBuilderArray)
         {
             throw new NotImplementedException();
         }
 
-        private void GenerateOrdinaryArray(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderArray jsonSchemaBuilderArray)
+        private void GenerateOrdinaryArray(CodeBuilder codeBuilder, IdentifierString key, JSBArray jsonSchemaBuilderArray)
         {
-            foreach(IJsonSchemaBuilderPart part in jsonSchemaBuilderArray.Items)
+            foreach(IJSBPart part in jsonSchemaBuilderArray.Items)
             {
                 GenerateCodeForBuilderPart(codeBuilder, part.Name, part, parentIsArray: true);
             }
@@ -256,30 +256,30 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private string MakeCorrectItemType(IJsonSchemaBuilderPart jsonSchemaBuilderPart)
+        private string MakeCorrectItemType(IJSBPart jsonSchemaBuilderPart)
         {
             switch(jsonSchemaBuilderPart.PartType)
             {
-                case JsonSchemaBuilderPartType.Array:
+                case JSBPartType.Array:
                     //TODO support multiple items
-                    return $"List<{MakeCorrectItemType((jsonSchemaBuilderPart as JsonSchemaBuilderArray).Items.First())}>";
-                case JsonSchemaBuilderPartType.Object:
+                    return $"List<{MakeCorrectItemType((jsonSchemaBuilderPart as JSBArray).Items.First())}>";
+                case JSBPartType.Object:
                     return jsonSchemaBuilderPart.Name;
-                case JsonSchemaBuilderPartType.Integer:
+                case JSBPartType.Integer:
                     return "long";
-                case JsonSchemaBuilderPartType.Number:
+                case JSBPartType.Number:
                     return "double";
-                case JsonSchemaBuilderPartType.Boolean:
+                case JSBPartType.Boolean:
                     return "bool";
-                case JsonSchemaBuilderPartType.String:
+                case JSBPartType.String:
                     return "string";
-                case JsonSchemaBuilderPartType.Date:
+                case JSBPartType.Date:
                     return "DateTime";
-                case JsonSchemaBuilderPartType.DateTime:
+                case JSBPartType.DateTime:
                     return "DateTime";
-                case JsonSchemaBuilderPartType.Email:
+                case JSBPartType.Email:
                     return "Email";
-                case JsonSchemaBuilderPartType.Time:
+                case JSBPartType.Time:
                     return "DateTime";
                 default:
                     throw new NotImplementedException();
@@ -291,7 +291,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Boolean
 
-        private void GenerateOrdinaryBoolaen(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean)
+        private void GenerateOrdinaryBoolaen(CodeBuilder codeBuilder, IdentifierString key, JSBBoolean jsonSchemaBuilderBoolean)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderBoolean);
 
@@ -301,7 +301,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .EmptyLine();
         }
 
-        private void GenerateEnumBoolean(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean)
+        private void GenerateEnumBoolean(CodeBuilder codeBuilder, IdentifierString key, JSBBoolean jsonSchemaBuilderBoolean)
         {
             throw new NotImplementedException();
         }
@@ -310,7 +310,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Date
 
-        private void GenerateOrdinaryDate(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDate jsonSchemaBuilderDate)
+        private void GenerateOrdinaryDate(CodeBuilder codeBuilder, IdentifierString key, JSBDate jsonSchemaBuilderDate)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderDate);
 
@@ -320,7 +320,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .EmptyLine();
         }
 
-        private void GenerateEnumDate(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDate jsonSchemaBuilderDate)
+        private void GenerateEnumDate(CodeBuilder codeBuilder, IdentifierString key, JSBDate jsonSchemaBuilderDate)
         {
             throw new NotImplementedException();
         }
@@ -329,7 +329,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate DateTime
 
-        private void GenerateOrdinaryDateTime(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime)
+        private void GenerateOrdinaryDateTime(CodeBuilder codeBuilder, IdentifierString key, JSBDateTime jsonSchemaBuilderDateTime)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderDateTime);
 
@@ -339,7 +339,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .EmptyLine();
         }
 
-        private void GenerateEnumDateTime(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime)
+        private void GenerateEnumDateTime(CodeBuilder codeBuilder, IdentifierString key, JSBDateTime jsonSchemaBuilderDateTime)
         {
             throw new NotImplementedException();
         }
@@ -348,12 +348,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Email
 
-        private void GenerateEnumEmail(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderEmail jsonSchemaBuilderEmail)
+        private void GenerateEnumEmail(CodeBuilder codeBuilder, IdentifierString key, JSBEmail jsonSchemaBuilderEmail)
         {
             throw new NotImplementedException();
         }
 
-        private void GenerateOrdinaryEmail(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderEmail jsonSchemaBuilderEmail)
+        private void GenerateOrdinaryEmail(CodeBuilder codeBuilder, IdentifierString key, JSBEmail jsonSchemaBuilderEmail)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderEmail);
 
@@ -367,7 +367,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Integer
 
-        private void GenerateOrdinaryInteger(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderInteger jsonSchemaBuilderInteger)
+        private void GenerateOrdinaryInteger(CodeBuilder codeBuilder, IdentifierString key, JSBInteger jsonSchemaBuilderInteger)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderInteger);
 
@@ -377,7 +377,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .EmptyLine();
         }
 
-        private void GenerateEnumInteger(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderInteger jsonSchemaBuilderInteger)
+        private void GenerateEnumInteger(CodeBuilder codeBuilder, IdentifierString key, JSBInteger jsonSchemaBuilderInteger)
         {
             throw new NotImplementedException();
         }
@@ -386,7 +386,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Number
 
-        private void GenerateOrdinaryNumber(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderNumber jsonSchemaBuilderNumber)
+        private void GenerateOrdinaryNumber(CodeBuilder codeBuilder, IdentifierString key, JSBNumber jsonSchemaBuilderNumber)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderNumber);
 
@@ -396,7 +396,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .EmptyLine();
         }
 
-        private void GenerateEnumNumber(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderNumber jsonSchemaBuilderNumber)
+        private void GenerateEnumNumber(CodeBuilder codeBuilder, IdentifierString key, JSBNumber jsonSchemaBuilderNumber)
         {
             throw new NotImplementedException();
         }
@@ -405,12 +405,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Objects
 
-        private void GenerateEnumObject(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderObject jsonSchemaBuilderObject, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions)
+        private void GenerateEnumObject(CodeBuilder codeBuilder, IdentifierString key, JSBObject jsonSchemaBuilderObject, Dictionary<IdentifierString, IJSBPart> definitions)
         {
             throw new NotImplementedException();
         }
 
-        private void GenerateOrdinaryObject(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderObject jsonSchemaBuilderObject, Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions, bool parentIsArray)
+        private void GenerateOrdinaryObject(CodeBuilder codeBuilder, IdentifierString key, JSBObject jsonSchemaBuilderObject, Dictionary<IdentifierString, IJSBPart> definitions, bool parentIsArray)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderObject);
 
@@ -422,7 +422,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             //Add definitions
             if (definitions != null)
             {
-                foreach (KeyValuePair<IdentifierString, IJsonSchemaBuilderPart> pair in definitions)
+                foreach (KeyValuePair<IdentifierString, IJSBPart> pair in definitions)
                 {
                     GenerateCodeForBuilderPart(codeBuilder, pair.Key, pair.Value);
                     codeBuilder.EmptyLine();
@@ -432,7 +432,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             //TODO Add own code
 
             //Add children
-            foreach (KeyValuePair<IdentifierString, IJsonSchemaBuilderPart> pair in jsonSchemaBuilderObject.Properties)
+            foreach (KeyValuePair<IdentifierString, IJSBPart> pair in jsonSchemaBuilderObject.Properties)
             {
                 GenerateCodeForBuilderPart(codeBuilder, pair.Key, pair.Value);
                 codeBuilder.EmptyLine();
@@ -456,7 +456,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate String
 
-        private void GenerateEnumString(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderString jsonSchemaBuilderString)
+        private void GenerateEnumString(CodeBuilder codeBuilder, IdentifierString key, JSBString jsonSchemaBuilderString)
         {
             codeBuilder
                 .L($"public enum {TransformToTitleCase(key)}Enum")
@@ -480,7 +480,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .EmptyLine();
         }
 
-        private void GenerateOrdinaryString(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderString jsonSchemaBuilderString)
+        private void GenerateOrdinaryString(CodeBuilder codeBuilder, IdentifierString key, JSBString jsonSchemaBuilderString)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderString);
 
@@ -494,12 +494,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Time
 
-        private void GenerateEnumTime(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderTime jsonSchemaBuilderTime)
+        private void GenerateEnumTime(CodeBuilder codeBuilder, IdentifierString key, JSBTime jsonSchemaBuilderTime)
         {
             throw new NotImplementedException();
         }
 
-        private void GenerateOrdinaryTime(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderTime jsonSchemaBuilderTime)
+        private void GenerateOrdinaryTime(CodeBuilder codeBuilder, IdentifierString key, JSBTime jsonSchemaBuilderTime)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderTime);
 
@@ -513,7 +513,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Uri Reference
 
-        private void GenerateOrdinaryUriReference(CodeBuilder codeBuilder, IdentifierString key, JsonSchemaBuilderIriReference jsonSchemaBuilderIriReference)
+        private void GenerateOrdinaryUriReference(CodeBuilder codeBuilder, IdentifierString key, JSBRef jsonSchemaBuilderIriReference)
         {
             try
             {
@@ -573,7 +573,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private void GenerateCodeFromSchema(CodeBuilder codeBuilder, JsonValue jsonValueOfSchema, IdentifierString key, JsonSchemaBuilderIriReference jsonSchemaBuilderUriReference)
+        private void GenerateCodeFromSchema(CodeBuilder codeBuilder, JsonValue jsonValueOfSchema, IdentifierString key, JSBRef jsonSchemaBuilderUriReference)
         {
             if (jsonValueOfSchema.Type == JsonValueType.Object)
             {
@@ -662,7 +662,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         /// <param name="codeBuilder"></param>
         /// <param name="key"></param>
         /// <param name="jsonSchemaBuilderPart"></param>
-        private void GenerateComments(CodeBuilder codeBuilder, IdentifierString key, IJsonSchemaBuilderPart jsonSchemaBuilderPart)
+        private void GenerateComments(CodeBuilder codeBuilder, IdentifierString key, IJSBPart jsonSchemaBuilderPart)
         {
             List<string> commentLines = GenerateCommentLines(key, jsonSchemaBuilderPart.Description, minSplitLength: 70, maxSplitLength: 90);
 
@@ -687,30 +687,30 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate Defaults
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderString jsonSchemaBuilderString)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBString jsonSchemaBuilderString)
         {
             return string.IsNullOrWhiteSpace(jsonSchemaBuilderString.DefaultValue) ? string.Empty : $" = \"{jsonSchemaBuilderString.DefaultValue}\";";
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderEmail jsonSchemaBuilderEmail)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBEmail jsonSchemaBuilderEmail)
         {
             return string.IsNullOrWhiteSpace(jsonSchemaBuilderEmail.DefaultValue) ? string.Empty : $" = new MailAddress(\"{jsonSchemaBuilderEmail.DefaultValue}\");";
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderDateTime jsonSchemaBuilderDateTime)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBDateTime jsonSchemaBuilderDateTime)
         {
             return string.IsNullOrWhiteSpace(jsonSchemaBuilderDateTime.DefaultValue) ? string.Empty : $" = DateTime.Parse(\"{jsonSchemaBuilderDateTime.DefaultValue}\");";
         }
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderDate jsonSchemaBuilderDate)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBDate jsonSchemaBuilderDate)
         {
             return string.IsNullOrWhiteSpace(jsonSchemaBuilderDate.DefaultValue) ? string.Empty : $" = DateTime.Parse(\"{jsonSchemaBuilderDate.DefaultValue}\");";
         }
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderTime jsonSchemaBuilderTime)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBTime jsonSchemaBuilderTime)
         {
             return string.IsNullOrWhiteSpace(jsonSchemaBuilderTime.DefaultValue) ? string.Empty : $" = DateTime.Parse(\"{jsonSchemaBuilderTime.DefaultValue}\");";
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderBoolean jsonSchemaBuilderBoolean)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBBoolean jsonSchemaBuilderBoolean)
         {
             if (jsonSchemaBuilderBoolean.DefaultValue.HasValue)
             {
@@ -723,7 +723,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderInteger jsonSchemaBuilderInteger)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBInteger jsonSchemaBuilderInteger)
         {
             if (jsonSchemaBuilderInteger.DefaultValue.HasValue)
             {
@@ -735,7 +735,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderNumber jsonSchemaBuilderNumber)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBNumber jsonSchemaBuilderNumber)
         {
             if (jsonSchemaBuilderNumber.DefaultValue.HasValue)
             {
@@ -747,7 +747,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderArray jsonSchemaBuilderArray)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBArray jsonSchemaBuilderArray)
         {
             if (jsonSchemaBuilderArray.DefaultValue != null)
             {
@@ -759,7 +759,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-        private string GenerateDefaultIfExisting(IdentifierString key, JsonSchemaBuilderIriReference jsonSchemaBuilderUriReference)
+        private string GenerateDefaultIfExisting(IdentifierString key, JSBRef jsonSchemaBuilderUriReference)
         {
             if(jsonSchemaBuilderUriReference.DefaultValue != null)
             {

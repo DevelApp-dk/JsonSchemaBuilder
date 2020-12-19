@@ -7,9 +7,9 @@ using System.Collections.Generic;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public abstract class AbstractJsonSchemaBuilderPart<T> : IJsonSchemaBuilderPart
+    public abstract class AbstractJSBPart<T> : IJSBPart
     {
-        public AbstractJsonSchemaBuilderPart(IdentifierString name, string description, bool isRequired, 
+        public AbstractJSBPart(IdentifierString name, string description, bool isRequired, 
             T defaultValue, List<T> examples, List<T> enums)
         {
             var type = typeof(T);
@@ -62,7 +62,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 
         public List<T> Enums { get; }
 
-        public abstract JsonSchemaBuilderPartType PartType { get; }
+        public abstract JSBPartType PartType { get; }
 
         public abstract JsonSchema AsJsonSchema();
 

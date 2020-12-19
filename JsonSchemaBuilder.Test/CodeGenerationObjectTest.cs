@@ -41,18 +41,18 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            JsonSchemaBuilderBoolean booleanPart = new JsonSchemaBuilderBoolean("BooleanPart", "BooleanPart for testing", isRequired: true);
-            JsonSchemaBuilderInteger integerPart = new JsonSchemaBuilderInteger("IntegerPart", "IntegerPart for testing");
+            JSBBoolean booleanPart = new JSBBoolean("BooleanPart", "BooleanPart for testing", isRequired: true);
+            JSBInteger integerPart = new JSBInteger("IntegerPart", "IntegerPart for testing");
 
-            Dictionary<IdentifierString, IJsonSchemaBuilderPart> properties = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
-            properties.Add(booleanPart.Name, booleanPart);
-            properties.Add(integerPart.Name, integerPart);
+            List<IJSBPart> properties = new List<IJSBPart>();
+            properties.Add(booleanPart);
+            properties.Add(integerPart);
 
-            JsonSchemaBuilderObject objectPart = new JsonSchemaBuilderObject("MyTopPartObject", "TopPart", properties: properties);
+            JSBObject objectPart = new JSBObject("MyTopPartObject", "TopPart", props: properties);
 
-            return new JsonSchemaBuilderSchema("ObjectAsATopPart", Description, topPart: objectPart);
+            return new JSBSchema("ObjectAsATopPart", Description, topPart: objectPart);
         }
     }
 }

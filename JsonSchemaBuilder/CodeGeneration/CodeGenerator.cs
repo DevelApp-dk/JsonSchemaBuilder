@@ -44,12 +44,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             DoReferenceResolution(schema.JsonSchemaBuilderSchema, schema.Module);
         }
 
-        private void DoReferenceResolution(IJsonSchemaBuilderPart jsonSchemaBuilderPart, NamespaceString module)
+        private void DoReferenceResolution(IJSBPart jsonSchemaBuilderPart, NamespaceString module)
         {
             switch(jsonSchemaBuilderPart.PartType)
             {
-                case JsonSchemaBuilderPartType.IriReference:
-                    JsonSchemaBuilderIriReference jsonSchemaBuilderIriReference = jsonSchemaBuilderPart as JsonSchemaBuilderIriReference;
+                case JSBPartType.IriReference:
+                    JSBRef jsonSchemaBuilderIriReference = jsonSchemaBuilderPart as JSBRef;
                     if (!jsonSchemaBuilderIriReference.IriReference.AbsoluteUri.Equals(jsonSchemaBuilderIriReference.IriReference.Fragment))
                     {
                         string relativeLocalFileWithExpandedDot = jsonSchemaBuilderIriReference.RelativeLocalFile;
@@ -97,9 +97,9 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         }
                     }
                     break;
-                case JsonSchemaBuilderPartType.Schema:
-                    JsonSchemaBuilderSchema jsonSchemaBuilderSchema = jsonSchemaBuilderPart as JsonSchemaBuilderSchema;
-                    foreach (IJsonSchemaBuilderPart definition in jsonSchemaBuilderSchema.Definitions.Values)
+                case JSBPartType.Schema:
+                    JSBSchema jsonSchemaBuilderSchema = jsonSchemaBuilderPart as JSBSchema;
+                    foreach (IJSBPart definition in jsonSchemaBuilderSchema.Definitions.Values)
                     {
                         DoReferenceResolution(definition, module);
                     }
@@ -108,16 +108,16 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         DoReferenceResolution(jsonSchemaBuilderSchema.TopPart, module);
                     }
                     break;
-                case JsonSchemaBuilderPartType.Array:
-                    JsonSchemaBuilderArray jsonSchemaBuilderArray = jsonSchemaBuilderPart as JsonSchemaBuilderArray;
-                    foreach(IJsonSchemaBuilderPart part in jsonSchemaBuilderArray.Items)
+                case JSBPartType.Array:
+                    JSBArray jsonSchemaBuilderArray = jsonSchemaBuilderPart as JSBArray;
+                    foreach(IJSBPart part in jsonSchemaBuilderArray.Items)
                     {
                         DoReferenceResolution(part, module);
                     }
                     break;
-                case JsonSchemaBuilderPartType.Object:
-                    JsonSchemaBuilderObject jsonSchemaBuilderObject = jsonSchemaBuilderPart as JsonSchemaBuilderObject;
-                    foreach(IJsonSchemaBuilderPart property in jsonSchemaBuilderObject.Properties.Values)
+                case JSBPartType.Object:
+                    JSBObject jsonSchemaBuilderObject = jsonSchemaBuilderPart as JSBObject;
+                    foreach(IJSBPart property in jsonSchemaBuilderObject.Properties.Values)
                     {
                         DoReferenceResolution(property, module);
                     }

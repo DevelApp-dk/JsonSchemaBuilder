@@ -5,50 +5,49 @@ using System.Collections.Generic;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public class JsonSchemaBuilderSchema : AbstractJsonSchemaBuilderPart<JsonValue>
+    public class JSBSchema : AbstractJSBPart<JsonValue>
     {
-        public static JsonSchemaBuilderSchema BuildSchema(JsonSchema jsonSchema)
+        public static JSBSchema BuildSchema(JsonSchema jsonSchema)
         {
             if(jsonSchema.Equals(JsonSchema.Empty))
             {
-                return new JsonSchemaBuilderSchema("NoValidation", "Represents an empty schema with disabled validation");
+                return new JSBSchema("NoValidation", "Represents an empty schema with disabled validation");
             }
 
-            IJsonSchemaBuilderPart topPart = null;
+            IJSBPart topPart = null;
             
             //TODO build from the schema
 
-            JsonSchemaBuilderSchema jsonSchemaBuilderSchema = new JsonSchemaBuilderSchema(jsonSchema.Id, jsonSchema.Description(), topPart);
+            JSBSchema jsonSchemaBuilderSchema = new JSBSchema(jsonSchema.Id, jsonSchema.Description(), topPart);
 
             return jsonSchemaBuilderSchema;
         }
 
-        public JsonSchemaBuilderSchema(IdentifierString schemaName, string description, 
-            IJsonSchemaBuilderPart topPart = null, 
-            Dictionary<IdentifierString, IJsonSchemaBuilderPart> definitions = null, JsonValue defaultValue = null,
+        public JSBSchema(IdentifierString schemaName, string description, 
+            IJSBPart topPart = null, 
+            List<IJSBPart> defs = null, JsonValue defaultValue = null,
             List<JsonValue> examples = null, List<JsonValue> enums = null, bool isRequired = false) 
             : base(schemaName, description, isRequired, defaultValue, examples, enums)
         {
             TopPart = topPart;
-            if (definitions != null)
+            if (defs != null)
             {
-                Definitions = definitions;
-            }
-            else
-            {
-                Definitions = new Dictionary<IdentifierString, IJsonSchemaBuilderPart>();
+                foreach (IJSBPart part in defs)
+                {
+                    Definitions.Add(part.Name, part);
+                }
             }
         }
 
-        public Dictionary<IdentifierString, IJsonSchemaBuilderPart> Definitions { get; }
+        public Dictionary<IdentifierString, IJSBPart> Definitions { get; } = new Dictionary<IdentifierString, IJSBPart>();
 
-        public IJsonSchemaBuilderPart TopPart { get; }
+        public IJSBPart TopPart { get; }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Schema;
+                return JSBPartType.Schema;
             }
         }
 

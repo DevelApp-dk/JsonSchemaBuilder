@@ -6,9 +6,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience time definition in Json Schema against several formats (ISO-8601 compatible)
     /// </summary>
-    public class JsonSchemaBuilderTime : JsonSchemaBuilderString
+    public class JSBTime : JSBString
     {
-        public JsonSchemaBuilderTime(
+        public JSBTime(
             IdentifierString timeName, 
             string description, 
             DateTime? defaultValue = null, 
@@ -22,11 +22,11 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             {
             }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         { 
             get
             {
-                return JsonSchemaBuilderPartType.Time;
+                return JSBPartType.Time;
             }
         }
     }

@@ -9,9 +9,9 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
     /// <summary>
     /// Convenience array definition in Json Schema. Requires Items definition.
     /// </summary>
-    public class JsonSchemaBuilderArray : AbstractJsonSchemaBuilderPart<JsonValue>
+    public class JSBArray : AbstractJSBPart<JsonValue>
     {
-        public JsonSchemaBuilderArray(IdentifierString arrayName, string description, List<IJsonSchemaBuilderPart> items,
+        public JSBArray(IdentifierString arrayName, string description, List<IJSBPart> items,
             uint? minItems = null, uint? maxItems = null, bool uniqueItems = false, JsonValue defaultValue = null, List<JsonValue> examples = null, List<JsonValue> enums = null, bool isRequired = false) 
             : base(arrayName, description, isRequired, defaultValue, examples, enums)
         {
@@ -25,18 +25,18 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             UniqueItems = uniqueItems;
         }
 
-        public List<IJsonSchemaBuilderPart> Items { get; }
+        public List<IJSBPart> Items { get; }
 
         public uint? MinItems { get; }
         public uint? MaxItems { get; }
 
         public bool UniqueItems { get; }
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Array;
+                return JSBPartType.Array;
             }
         }
 
@@ -44,7 +44,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
         {
             JsonSchema returnSchema = InitialJsonSchema()
                 .Type(JsonSchemaType.Array);
-            foreach(IJsonSchemaBuilderPart jsonSchemaBuilderPart in Items)
+            foreach(IJSBPart jsonSchemaBuilderPart in Items)
             {
                 returnSchema.Items(jsonSchemaBuilderPart.AsJsonSchema());
             }

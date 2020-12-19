@@ -42,15 +42,15 @@ namespace JsonSchemaBuilder.Test
             }
         }
 
-        protected override JsonSchemaBuilderSchema BuildJsonSchema()
+        protected override JSBSchema BuildJsonSchema()
         {
-            List<IJsonSchemaBuilderPart> items = new List<IJsonSchemaBuilderPart>();
+            List<IJSBPart> items = new List<IJSBPart>();
 
-            items.Add(new JsonSchemaBuilderInteger("SwanNumber", "Swans are relevant in the world"));
+            items.Add(new JSBInteger("SwanNumber", "Swans are relevant in the world"));
 
-            JsonSchemaBuilderArray arrayPart = new JsonSchemaBuilderArray("MyTopPartArray", "TopPart", items);
+            JSBArray arrayPart = new JSBArray("MyTopPartArray", "TopPart", items);
 
-            return new JsonSchemaBuilderSchema("ArrayAsATopPart", Description, topPart: arrayPart);
+            return new JSBSchema("ArrayAsATopPart", Description, topPart: arrayPart);
         }
     }
 }

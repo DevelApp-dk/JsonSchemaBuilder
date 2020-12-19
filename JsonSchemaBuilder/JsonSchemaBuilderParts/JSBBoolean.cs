@@ -3,20 +3,20 @@ using Manatee.Json.Schema;
 
 namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
 {
-    public class JsonSchemaBuilderBoolean : AbstractJsonSchemaBuilderPart<bool?>
+    public class JSBBoolean : AbstractJSBPart<bool?>
     {
-        public JsonSchemaBuilderBoolean(IdentifierString boolName, string description, 
+        public JSBBoolean(IdentifierString boolName, string description, 
             bool? defaultValue = null, bool isRequired = false) : 
             base(boolName, description, isRequired, defaultValue: defaultValue, examples: null, enums: null)
         {
         }
 
 
-        public override JsonSchemaBuilderPartType PartType
+        public override JSBPartType PartType
         {
             get
             {
-                return JsonSchemaBuilderPartType.Boolean;
+                return JSBPartType.Boolean;
             }
         }
 
