@@ -50,7 +50,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             {
                 case JSBPartType.IriReference:
                     JSBRef jsonSchemaBuilderIriReference = jsonSchemaBuilderPart as JSBRef;
-                    if (!jsonSchemaBuilderIriReference.IriReference.AbsoluteUri.Equals(jsonSchemaBuilderIriReference.IriReference.Fragment))
+                    if (!jsonSchemaBuilderIriReference.IsFragmentOnly)
                     {
                         string relativeLocalFileWithExpandedDot = jsonSchemaBuilderIriReference.RelativeLocalFile;
                         if (relativeLocalFileWithExpandedDot.StartsWith("./") || relativeLocalFileWithExpandedDot.StartsWith(".\\"))
@@ -59,10 +59,10 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         }
 
                         string localFile = Path.Combine(_applicationRoot, relativeLocalFileWithExpandedDot);
-                        string uriWithoutFragmentString = jsonSchemaBuilderIriReference.IriReference.AbsoluteUri;
-                        if(!string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.IriReference.Fragment))
+                        string uriWithoutFragmentString = jsonSchemaBuilderIriReference.IriReference.OriginalString;
+                        if(!string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment))
                         {
-                            uriWithoutFragmentString = uriWithoutFragmentString.Replace(jsonSchemaBuilderIriReference.IriReference.Fragment, "");
+                            uriWithoutFragmentString = uriWithoutFragmentString.Replace("#" + jsonSchemaBuilderIriReference.Fragment, "");
                         }
                         if (Uri.TryCreate(uriWithoutFragmentString, UriKind.RelativeOrAbsolute, out Uri uriWithoutFragment))
                         {

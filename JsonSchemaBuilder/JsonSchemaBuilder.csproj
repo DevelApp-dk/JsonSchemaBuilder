@@ -10,7 +10,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/DevelApp-dk/JsonSchemaBuilder</RepositoryUrl>
     <Description>Simple Json Schema builder for Manatee.Json to make it faster to combine in code</Description>
-    <Version>1.0.13</Version>
+    <Version>1.0.14</Version>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <RepositoryType>Git</RepositoryType>
@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.SmartEnum" Version="2.0.0" />
-    <PackageReference Include="DevelApp.Utility" Version="1.0.5" />
+    <PackageReference Include="DevelApp.Utility" Version="1.0.6" />
     <PackageReference Include="manatee.json" Version="13.0.3" />
   </ItemGroup>
 

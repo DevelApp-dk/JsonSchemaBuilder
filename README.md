@@ -45,11 +45,9 @@ Code generation is built based on the above schema parts
 * Create DataString data class to replace string ?
 * Add implicit casts in classes
 * Add Base64String with conversions
-* More intelligent testing if possible for serialization of export formats
 * Support for AnyOf, OneOf and AllOf (last done through conversion)
 * C#: Expand support for serializer other than Newtonsoft version
   * Microsoft own
   * Akka.Net serializer Hyperion
 * Support for later than Draft 7 schema
 * Use of Microsoft own serializer and [json-everything](https://github.com/gregsdennis/json-everything) instead of [Manatee.Json](https://github.com/gregsdennis/Manatee.Json)
-* Better support for UriReference
