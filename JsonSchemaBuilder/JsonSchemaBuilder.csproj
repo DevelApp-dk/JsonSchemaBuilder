@@ -10,7 +10,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/DevelApp-dk/JsonSchemaBuilder</RepositoryUrl>
     <Description>Simple Json Schema builder for Manatee.Json to make it faster to combine in code</Description>
-    <Version>1.0.12</Version>
+    <Version>1.0.13</Version>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <RepositoryType>Git</RepositoryType>
