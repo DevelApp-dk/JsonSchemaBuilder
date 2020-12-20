@@ -27,7 +27,10 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             }
             else
             {
-                fragment = iriReference.OriginalString.Substring(iriReference.OriginalString.IndexOf('#'));
+                if (iriReference.OriginalString.IndexOf('#') > -1)
+                {
+                    fragment = iriReference.OriginalString.Substring(iriReference.OriginalString.IndexOf('#'));
+                }
             }
             if(fragment.StartsWith("#"))
             {

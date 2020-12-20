@@ -2,6 +2,7 @@ using DevelApp.JsonSchemaBuilder;
 using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
 using DevelApp.Utility.Model;
 using Manatee.Json.Schema;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -77,9 +78,51 @@ namespace JsonSchemaBuilder.Test
         }
 
         [Fact]
-        public void BuildReference()
+        public void BuildReference_Relative()
         {
+            string refName = "refName";
+            string refDesc = "Description of refName";
+            Uri uri = new Uri("./address.schema.json", UriKind.Relative);
 
+            var varref = new JSBRef(refName, refDesc, uri);
+
+            JsonSchema varSchema = varref.AsJsonSchema();
+        }
+
+        [Fact]
+        public void BuildReference_Relative_WithFragment()
+        {
+            string refName = "refName";
+            string refDesc = "Description of refName";
+            Uri uri = new Uri("./address.schema.json#/definitions/ftp", UriKind.Relative);
+
+            var varref = new JSBRef(refName, refDesc, uri);
+
+            JsonSchema varSchema = varref.AsJsonSchema();
+        }
+
+        [Fact]
+        public void BuildReference_Absolute()
+        {
+            string refName = "refName";
+            string refDesc = "Description of refName";
+            Uri uri = new Uri("///E:/Projects/Funny/Onion/address.schema.json", UriKind.Relative);
+
+            var varref = new JSBRef(refName, refDesc, uri);
+
+            JsonSchema varSchema = varref.AsJsonSchema();
+        }
+
+        [Fact]
+        public void BuildReference_Absolute_WithFragment()
+        {
+            string refName = "refName";
+            string refDesc = "Description of refName";
+            Uri uri = new Uri("///E:/Projects/Funny/Onion/address.schema.json#/definitions/ftp", UriKind.Relative);
+
+            var varref = new JSBRef(refName, refDesc, uri);
+
+            JsonSchema varSchema = varref.AsJsonSchema();
         }
 
         [Fact]
