@@ -22,9 +22,9 @@ My intention is to support all parts of the official Json Schema Draft 7 and som
   This is a bit different in that it only wraps one of the other parts as a  top part and otherwise handles definitions as they can only be handled on the schema level
 * **String**
 * **Time**
-* **UriReference**
+* **Uri/UriReference/Iri/IriReference**
 
-  This has the limitation that it does not get referenced schemas and expect referenced schemas to be located locally. References can only be referencing part of definitions or entire schema.
+  This has the limitation that references can only be referencing part of definitions or entire schema.
 
 ## Code generation
 Code generation is built based on the above schema parts
@@ -44,6 +44,7 @@ Code generation is built based on the above schema parts
 * Create Email data class (with System.Net.Mail.MailAddress as inner?)
 * Create DataString data class to replace string ?
 * Add implicit casts in classes
+* Enum support for other that String
 * Add Base64String with conversions
 * Support for AnyOf, OneOf and AllOf (last done through conversion)
 * C#: Expand support for serializer other than Newtonsoft version

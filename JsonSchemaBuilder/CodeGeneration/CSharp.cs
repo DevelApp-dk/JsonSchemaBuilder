@@ -21,22 +21,31 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         /// </summary>
         /// <param name="schema"></param>
         /// <returns></returns>
-        internal static (string fileName, string code) GenerateCode(string applicationRoot, IJsonSchemaDefinition schema)
+        internal static List<(string fileName, string code)> GenerateCode(CodeGenerator codeGenerator)
         {
-            string fileName = Path.Combine(applicationRoot, schema.Module.ToFilePath, schema.Name + FILE_ENDING);
+            List<(string fileName, string code)> generatedCode = new List<(string fileName, string code)>();
+            foreach (var schema in codeGenerator.RegisteredJsonSchemas.Values)
+            {
+                string fileName = Path.Combine(codeGenerator.ApplicationRoot, schema.Module.ToFilePath, schema.Name + FILE_ENDING);
 
-            CSharp cSharp = new CSharp(applicationRoot, schema.Module);
-            return (fileName, cSharp.GenerateCode(schema.JsonSchemaBuilderSchema));
+                CSharp cSharp = new CSharp(codeGenerator, schema.Module);
+                generatedCode.Add((fileName, cSharp.GenerateCode(schema.JsonSchemaBuilderSchema)));
+            }
+            return generatedCode;
         }
 
         private NamespaceString _startNameSpace;
         private string _applicationRoot;
         private JSBSchema _rootSchema;
+        private Dictionary<string, IJsonSchemaDefinition> _registeredSchemas;
+        private CodeGenerator _codeGenerator;
 
-        private CSharp(string applicationRoot, NamespaceString startNameSpace)
+        private CSharp(CodeGenerator codeGenerator, NamespaceString startNameSpace)
         {
-            _applicationRoot = applicationRoot;
+            _applicationRoot = codeGenerator.ApplicationRoot;
             _startNameSpace = startNameSpace;
+            _registeredSchemas = codeGenerator.RegisteredJsonSchemas;
+            _codeGenerator = codeGenerator;
         }
 
         /// <summary>
@@ -243,7 +252,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumArray(CodeBuilder codeBuilder, IdentifierString key, JSBArray jsonSchemaBuilderArray)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum for array has not been implemented");
         }
 
         private void GenerateOrdinaryArray(CodeBuilder codeBuilder, IdentifierString key, JSBArray jsonSchemaBuilderArray)
@@ -283,6 +292,11 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 case JSBPartType.Boolean:
                     return "bool";
                 case JSBPartType.String:
+                    JSBString jSBString = jsonSchemaBuilderPart as JSBString;
+                    if(jSBString.Enums.Count > 0)
+                    {
+                        return jsonSchemaBuilderPart.Name + "Enum";
+                    }
                     return "string";
                 case JSBPartType.Date:
                     return "DateTime";
@@ -292,8 +306,18 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     return "Email";
                 case JSBPartType.Time:
                     return "DateTime";
+                case JSBPartType.Schema:
+                    JSBSchema jSBSchema = jsonSchemaBuilderPart as JSBSchema;
+                    if (jSBSchema.TopPart != null)
+                    {
+                        return MakeCorrectItemType(jSBSchema.TopPart);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException($"MakeCorrectItemType for Schema without a topPart has not been implemented");
+                    }
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"MakeCorrectItemType for {jsonSchemaBuilderPart.PartType} has not been implemented");
             }
 
         }
@@ -314,7 +338,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumBoolean(CodeBuilder codeBuilder, IdentifierString key, JSBBoolean jsonSchemaBuilderBoolean)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum on Boolean has not been implemeneted");
         }
 
         #endregion
@@ -333,7 +357,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumDate(CodeBuilder codeBuilder, IdentifierString key, JSBDate jsonSchemaBuilderDate)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum on Date has not been implemeneted");
         }
 
         #endregion
@@ -352,7 +376,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumDateTime(CodeBuilder codeBuilder, IdentifierString key, JSBDateTime jsonSchemaBuilderDateTime)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum for DateTime had not been implemented");
         }
 
         #endregion
@@ -361,7 +385,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumEmail(CodeBuilder codeBuilder, IdentifierString key, JSBEmail jsonSchemaBuilderEmail)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum on email has not been implemented");
         }
 
         private void GenerateOrdinaryEmail(CodeBuilder codeBuilder, IdentifierString key, JSBEmail jsonSchemaBuilderEmail)
@@ -390,7 +414,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumInteger(CodeBuilder codeBuilder, IdentifierString key, JSBInteger jsonSchemaBuilderInteger)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum on integer has not been implemented");
         }
 
         #endregion
@@ -409,7 +433,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumNumber(CodeBuilder codeBuilder, IdentifierString key, JSBNumber jsonSchemaBuilderNumber)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum on number has not been implemeneted");
         }
 
         #endregion
@@ -418,7 +442,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumObject(CodeBuilder codeBuilder, IdentifierString key, JSBObject jsonSchemaBuilderObject, Dictionary<string, IJSBPart> definitions)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum on objects has not been implemented");
         }
 
         private void GenerateOrdinaryObject(CodeBuilder codeBuilder, IdentifierString key, JSBObject jsonSchemaBuilderObject, Dictionary<string, IJSBPart> definitions, bool parentIsArray)
@@ -507,7 +531,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void GenerateEnumTime(CodeBuilder codeBuilder, IdentifierString key, JSBTime jsonSchemaBuilderTime)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Enum on time is not implemented");
         }
 
         private void GenerateOrdinaryTime(CodeBuilder codeBuilder, IdentifierString key, JSBTime jsonSchemaBuilderTime)
@@ -558,43 +582,66 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                         relativeLocalFileWithExpandedDot = Path.Combine(_startNameSpace.ToFilePath, relativeLocalFileWithExpandedDot.Remove(0, 2));
                     }
 
-                    string localfile = Path.Combine(_applicationRoot, relativeLocalFileWithExpandedDot);
-                    if (File.Exists(localfile))
+                    if (_registeredSchemas.TryGetValue(relativeLocalFileWithExpandedDot, out IJsonSchemaDefinition jsonSchemaDefinition))
                     {
-                        schemaString = File.ReadAllText(localfile);
-                    }
-                    else
-                    {
-                        throw new CodeGenerationException($"Schema could not be found at the path {localfile}");
-                    }
-
-                    // make a schema and generate code from that
-                    JsonValue jsonValueOfSchema = JsonValue.Parse(schemaString);
-                    if (string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment) ||
-                        jsonSchemaBuilderIriReference.Fragment.Equals("/"))
-                    {
-                        //Process schema Json
-                        GenerateCodeFromSchema(codeBuilder, jsonValueOfSchema, key, jsonSchemaBuilderIriReference);
-                    }
-                    else if (jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
-                    {
-                        //TODO Avoid serialization step
-                        JsonSerializer jsonSerializer = new JsonSerializer();
-                        JsonSchema jsonSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValueOfSchema);
-                        string afterDefinitions = jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().Replace("/definitions/", "");
-                        if (jsonSchema.Definitions() != null && jsonSchema.Definitions().TryGetValue(afterDefinitions, out JsonSchema subSchema))
+                        if (jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
                         {
-                            //Process subschema Json
-                            GenerateCodeFromSchema(codeBuilder, subSchema.ToJson(jsonSerializer), key, jsonSchemaBuilderIriReference);
+                            string definitionKey = TransformToTitleCase(jsonSchemaBuilderIriReference.Fragment.Substring("/definitions/".Length));
+                            if (jsonSchemaDefinition.JsonSchemaBuilderSchema.Definitions.TryGetValue(definitionKey, out IJSBPart referencedPart))
+                            {
+                                GenerateCodeFromInternalPart(codeBuilder, referencedPart, key, jsonSchemaBuilderIriReference);
+                            }
+                            else
+                            {
+                                string validKeys = string.Join(",", _rootSchema.Definitions.Keys.ToList());
+                                throw new CodeGenerationException($"Reference {definitionKey} in {jsonSchemaBuilderIriReference.Fragment} from {jsonSchemaBuilderIriReference.Name} could not be found. Valid keys are {validKeys}");
+                            }
                         }
                         else
                         {
-                            throw new CodeGenerationException($"Could not find {afterDefinitions} in the definitions of the schema");
+                            GenerateCodeFromInternalPart(codeBuilder, jsonSchemaDefinition.JsonSchemaBuilderSchema, key, jsonSchemaBuilderIriReference);
                         }
                     }
                     else
                     {
-                        throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
+                        string localfile = Path.Combine(_applicationRoot, relativeLocalFileWithExpandedDot);
+                        if (File.Exists(localfile))
+                        {
+                            schemaString = File.ReadAllText(localfile);
+                        }
+                        else
+                        {
+                            throw new CodeGenerationException($"Schema could not be found at the path {localfile}");
+                        }
+
+                        // make a schema and generate code from that
+                        JsonValue jsonValueOfSchema = JsonValue.Parse(schemaString);
+                        if (string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment) ||
+                            jsonSchemaBuilderIriReference.Fragment.Equals("/"))
+                        {
+                            //Process schema Json
+                            GenerateCodeFromSchema(codeBuilder, jsonValueOfSchema, key, jsonSchemaBuilderIriReference);
+                        }
+                        else if (jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
+                        {
+                            //TODO Avoid serialization step
+                            JsonSerializer jsonSerializer = new JsonSerializer();
+                            JsonSchema jsonSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValueOfSchema);
+                            string afterDefinitions = jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().Replace("/definitions/", "");
+                            if (jsonSchema.Definitions() != null && jsonSchema.Definitions().TryGetValue(afterDefinitions, out JsonSchema subSchema))
+                            {
+                                //Process subschema Json
+                                GenerateCodeFromSchema(codeBuilder, subSchema.ToJson(jsonSerializer), key, jsonSchemaBuilderIriReference);
+                            }
+                            else
+                            {
+                                throw new CodeGenerationException($"Could not find {afterDefinitions} in the definitions of the schema");
+                            }
+                        }
+                        else
+                        {
+                            throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
+                        }
                     }
                 }
             }
@@ -807,7 +854,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         {
             if(jsonSchemaBuilderUriReference.DefaultValue != null)
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException($"Default value for Reference is not implemented");
             }
             else
             {
