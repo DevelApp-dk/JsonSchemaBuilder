@@ -6,3 +6,4 @@ obj
 ModelTest/
 /JsonSchemaBuilder.Test/DevelApp
 /JsonSchemaBuilder.Test/Funny
+JsonSchemaBuilder.Test/Default/

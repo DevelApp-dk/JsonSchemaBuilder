@@ -33,6 +33,11 @@ namespace DevelApp.JsonSchemaBuilder
         JSBSchema JsonSchemaBuilderSchema { get; }
 
         /// <summary>
+        /// Returns the filename for the jsonSchema
+        /// </summary>
+        string FileName { get; }
+
+        /// <summary>
         /// Writes the schema to filePath
         /// </summary>
         /// <param name="filePathBeforeModuleNamespace"></param>
@@ -49,7 +54,6 @@ namespace DevelApp.JsonSchemaBuilder
         /// Generate code to a path
         /// </summary>
         /// <param name="code"></param>
-        /// <param name="filePathBeforeModuleNamespace"></param>
         void GenerateCodeToFile(Code code, string applicationRoot);
     }
 }

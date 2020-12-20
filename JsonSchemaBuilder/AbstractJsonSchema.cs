@@ -6,6 +6,7 @@ using System.IO;
 using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
 using DevelApp.JsonSchemaBuilder.CodeGeneration;
 using DevelApp.Utility.Model;
+using System.Linq;
 
 namespace DevelApp.JsonSchemaBuilder
 {
@@ -79,8 +80,7 @@ namespace DevelApp.JsonSchemaBuilder
             if (JsonSchema != null)
             {
                 var schemaInJson = JsonSchema.ToJson(serializer);
-                string fileName = Path.Combine(Module.ToFilePath,TransformToCamelCase(Name) + FILE_ENDING);
-                string localFile = Path.Combine(applicationRoot, fileName);
+                string localFile = Path.Combine(applicationRoot, FileName);
                 FileInfo fileInfo = new FileInfo(localFile);
                 string directory = fileInfo.Directory.FullName;
                 if (!Directory.Exists(directory))
@@ -98,17 +98,20 @@ namespace DevelApp.JsonSchemaBuilder
 
         private CodeGenerator CodeGeneration(string applicationRoot)
         {
-            return new CodeGenerator(applicationRoot);
+            CodeGenerator codeGenerator = new CodeGenerator(applicationRoot);
+            codeGenerator.Register(this);
+            return codeGenerator;
         }
 
         /// <summary>
         /// Generate code to memory and suggest a filename
         /// </summary>
         /// <param name="code"></param>
+        /// <param name="applicationRoot"></param>
         /// <returns></returns>
         public (string fileName, string code) GenerateCode(Code code, string applicationRoot)
         {
-            return CodeGeneration(applicationRoot).Generate(code, this);
+            return CodeGeneration(applicationRoot).Generate(code).FirstOrDefault();
         }
 
         /// <summary>
@@ -118,7 +121,15 @@ namespace DevelApp.JsonSchemaBuilder
         /// <param name="applicationRoot"></param>
         public void GenerateCodeToFile(Code code, string applicationRoot)
         {
-            CodeGeneration(applicationRoot).GenerateToFile(code, this);
+            CodeGeneration(applicationRoot).GenerateToFile(code);
+        }
+
+        public string FileName
+        {
+            get
+            {
+                return Path.Combine(Module.ToFilePath, TransformToCamelCase(Name) + FILE_ENDING);
+            }
         }
 
         #endregion
