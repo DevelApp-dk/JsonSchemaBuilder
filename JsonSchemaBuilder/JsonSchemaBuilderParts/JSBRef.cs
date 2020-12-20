@@ -71,7 +71,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
                     localPath = localPath.Replace(fragment, "");
                 }
             }
-            if (!localPath.EndsWith(".schema.json"))
+            if (!string.IsNullOrWhiteSpace(localPath) && !localPath.EndsWith(".schema.json"))
             {
                 if (localPath.EndsWith(".json"))
                 {
@@ -110,6 +110,14 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             get
             {
                 return JSBPartType.IriReference;
+            }
+        }
+
+        public bool IsFragmentOnly 
+        { 
+            get
+            {
+                return string.IsNullOrWhiteSpace(RelativeLocalFile)  && !string.IsNullOrWhiteSpace(Fragment);
             }
         }
 

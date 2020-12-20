@@ -37,12 +37,6 @@ namespace JsonSchemaBuilder.Test
         }
 
         [Fact]
-        public void BuildArray()
-        {
-
-        }
-
-        [Fact]
         public void BuildString()
         {
             string objectName = "StringName";
@@ -60,21 +54,33 @@ namespace JsonSchemaBuilder.Test
         }
 
         [Fact]
-        public void BuildNumber()
+        public void BuildString_Enum_Simple()
         {
+            string objectName = "StringName";
+            string description = "StringDescription";
+            List<string> enums = new List<string>() { "FTP", "Custom", "NotSoCustom", "Default" };
 
+            var varString = new JSBString(objectName, description, enums: enums);
+
+            JsonSchema varSchema = varString.AsJsonSchema();
         }
 
         [Fact]
-        public void BuildInteger()
+        public void BuildString_Enum()
         {
+            string objectName = "StringName";
+            string description = "StringDescription";
+            string defaultValue = "default";
+            bool isRequired = false;
+            uint minLength = 4;
+            uint maxLength = 8;
+            string pattern = "fau";
+            List<string> enums = new List<string>() { "FTP", "Custom", "NotSoCustom", "Default" };
 
-        }
+            var varString = new JSBString(objectName, description, minLength: minLength,
+                maxLength: maxLength, pattern: pattern, defaultValue: defaultValue, isRequired: isRequired, enums: enums);
 
-        [Fact]
-        public void BuildEnum()
-        {
-
+            JsonSchema varSchema = varString.AsJsonSchema();
         }
 
         [Fact]
@@ -123,24 +129,6 @@ namespace JsonSchemaBuilder.Test
             var varref = new JSBRef(refName, refDesc, uri);
 
             JsonSchema varSchema = varref.AsJsonSchema();
-        }
-
-        [Fact]
-        public void BuildSchema()
-        {
-
-        }
-
-        [Fact]
-        public void BuildAnyOf()
-        {
-
-        }
-
-        [Fact]
-        public void BuildOneOf()
-        {
-
         }
     }
 }

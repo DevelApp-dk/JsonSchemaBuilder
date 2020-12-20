@@ -4,3 +4,5 @@ obj
 *.backup
 *.cs
 ModelTest/
+/JsonSchemaBuilder.Test/DevelApp
+/JsonSchemaBuilder.Test/Funny

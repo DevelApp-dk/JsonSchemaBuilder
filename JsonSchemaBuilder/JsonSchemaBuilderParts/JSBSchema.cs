@@ -39,7 +39,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
             }
         }
 
-        public Dictionary<IdentifierString, IJSBPart> Definitions { get; } = new Dictionary<IdentifierString, IJSBPart>();
+        public Dictionary<string, IJSBPart> Definitions { get; } = new Dictionary<string, IJSBPart>();
 
         public IJSBPart TopPart { get; }
 
@@ -60,7 +60,7 @@ namespace DevelApp.JsonSchemaBuilder.JsonSchemaParts
                 returnSchema.Schema("http://json-schema.org/draft-07/schema#");
                 foreach (var pair in Definitions)
                 {
-                    returnSchema.Definitions().Add(pair.Key, pair.Value.AsJsonSchema());
+                    returnSchema.Definition(pair.Key, pair.Value.AsJsonSchema());
                 }
                 return returnSchema;
             }
