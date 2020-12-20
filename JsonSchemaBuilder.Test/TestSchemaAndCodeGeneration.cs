@@ -6,6 +6,7 @@ using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
 using DevelApp.Utility.Model;
 using System.Linq;
 using DevelApp.JsonSchemaBuilder.CodeGeneration;
+using System.IO;
 
 namespace JsonSchemaBuilder.Test
 {
@@ -14,10 +15,13 @@ namespace JsonSchemaBuilder.Test
         [Fact]
         public void BuildFromAssembly()
         {
-            string pathString = "E:\\\\Projects\\JsonSchemaBuilder\\JsonSchemaBuilder.Test\\";
-            LoadAllJsonSchemaBuildersAndWriteSchemasToFile(pathString);
+            string pathString = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar;
+            string assemblyPath = GetType().Assembly.Location;
+            string pathStringExpanded = Path.GetFullPath(pathString, assemblyPath);
 
-            LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(pathString);
+            LoadAllJsonSchemaBuildersAndWriteSchemasToFile(pathStringExpanded);
+
+            LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(pathStringExpanded);
         }
 
 
