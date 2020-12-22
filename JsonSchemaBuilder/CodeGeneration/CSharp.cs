@@ -316,10 +316,53 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     {
                         throw new NotImplementedException($"MakeCorrectItemType for Schema without a topPart has not been implemented");
                     }
+                case JSBPartType.IriReference:
+                    JSBRef jsbRef = jsonSchemaBuilderPart as JSBRef;
+                    var pair = LookupReferencedPart(jsbRef);
+                    if (pair.refPart != null)
+                    {
+                        return MakeCorrectItemType(pair.refPart);
+                    }
+                    else if (pair.schemaValue != null)
+                    {
+                        return MakeCorrectItemType(pair.schemaValue);
+                    }
+                    else
+                    {
+                        throw new CodeGenerationException($"Could not find reference to {jsbRef.RelativeLocalFile}");
+                    }
                 default:
                     throw new NotImplementedException($"MakeCorrectItemType for {jsonSchemaBuilderPart.PartType} has not been implemented");
             }
 
+        }
+
+
+        private (IJSBPart refPart, JsonValue schemaValue) LookupReferencedPart(JSBRef jSBRef)
+        {
+            string relativeLocalFileWithExpandedDot =  ExpandRelativelocalFile(jSBRef.RelativeLocalFile);
+            if(string.IsNullOrWhiteSpace(relativeLocalFileWithExpandedDot))
+            {
+                relativeLocalFileWithExpandedDot = Path.Combine(_startNameSpace.ToFilePath,_rootSchema.Name + ".schema.json");
+            }
+            return _codeGenerator.LookupReferencedPart(_codeGenerator.TransformToCamelCase(relativeLocalFileWithExpandedDot), jSBRef);
+        }
+
+        /// <summary>
+        /// Expand local file if needed
+        /// </summary>
+        /// <param name="relativeLocalFile"></param>
+        /// <returns></returns>
+        private string ExpandRelativelocalFile(string relativeLocalFile)
+        {
+            if (relativeLocalFile.StartsWith("./") || relativeLocalFile.StartsWith(".\\"))
+            {
+                return Path.Combine(_startNameSpace.ToFilePath, relativeLocalFile.Remove(0, 2));
+            }
+            else
+            {
+                return relativeLocalFile;
+            }
         }
 
         #endregion
@@ -552,97 +595,18 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         {
             try
             {
-                if (jsonSchemaBuilderIriReference.IsFragmentOnly)
+                (IJSBPart refPart, JsonValue schemaValue) pair = LookupReferencedPart(jsonSchemaBuilderIriReference);
+                if (pair.refPart != null)
                 {
-                    if (jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
-                    {
-                        string definitionKey = TransformToTitleCase(jsonSchemaBuilderIriReference.Fragment.Substring("/definitions/".Length));
-                        if (_rootSchema.Definitions.TryGetValue(definitionKey, out IJSBPart referencedPart))
-                        {
-                            GenerateCodeFromInternalPart(codeBuilder, referencedPart, key, jsonSchemaBuilderIriReference);
-                        }
-                        else
-                        {
-                            string validKeys = string.Join(",", _rootSchema.Definitions.Keys.ToList());
-                            throw new CodeGenerationException($"Reference {definitionKey} in {jsonSchemaBuilderIriReference.Fragment} from {jsonSchemaBuilderIriReference.Name} could not be found. Valid keys are {validKeys}");
-                        }
-                    }
-                    else
-                    {
-                        throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
-                    }
+                    GenerateCodeFromInternalPart(codeBuilder, pair.refPart, key, jsonSchemaBuilderIriReference);
+                }
+                else if (pair.schemaValue != null)
+                {
+                    GenerateCodeFromSchema(codeBuilder, pair.schemaValue, key, jsonSchemaBuilderIriReference);
                 }
                 else
-                { 
-                    //Search for the schema file as .schema.json and .json and load it when found
-                    string schemaString = string.Empty;
-                    string relativeLocalFileWithExpandedDot = jsonSchemaBuilderIriReference.RelativeLocalFile;
-                    if (relativeLocalFileWithExpandedDot.StartsWith("./") || relativeLocalFileWithExpandedDot.StartsWith(".\\"))
-                    {
-                        relativeLocalFileWithExpandedDot = Path.Combine(_startNameSpace.ToFilePath, relativeLocalFileWithExpandedDot.Remove(0, 2));
-                    }
-
-                    if (_registeredSchemas.TryGetValue(relativeLocalFileWithExpandedDot, out IJsonSchemaDefinition jsonSchemaDefinition))
-                    {
-                        if (jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
-                        {
-                            string definitionKey = TransformToTitleCase(jsonSchemaBuilderIriReference.Fragment.Substring("/definitions/".Length));
-                            if (jsonSchemaDefinition.JsonSchemaBuilderSchema.Definitions.TryGetValue(definitionKey, out IJSBPart referencedPart))
-                            {
-                                GenerateCodeFromInternalPart(codeBuilder, referencedPart, key, jsonSchemaBuilderIriReference);
-                            }
-                            else
-                            {
-                                string validKeys = string.Join(",", _rootSchema.Definitions.Keys.ToList());
-                                throw new CodeGenerationException($"Reference {definitionKey} in {jsonSchemaBuilderIriReference.Fragment} from {jsonSchemaBuilderIriReference.Name} could not be found. Valid keys are {validKeys}");
-                            }
-                        }
-                        else
-                        {
-                            GenerateCodeFromInternalPart(codeBuilder, jsonSchemaDefinition.JsonSchemaBuilderSchema, key, jsonSchemaBuilderIriReference);
-                        }
-                    }
-                    else
-                    {
-                        string localfile = Path.Combine(_applicationRoot, relativeLocalFileWithExpandedDot);
-                        if (File.Exists(localfile))
-                        {
-                            schemaString = File.ReadAllText(localfile);
-                        }
-                        else
-                        {
-                            throw new CodeGenerationException($"Schema could not be found at the path {localfile}");
-                        }
-
-                        // make a schema and generate code from that
-                        JsonValue jsonValueOfSchema = JsonValue.Parse(schemaString);
-                        if (string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment) ||
-                            jsonSchemaBuilderIriReference.Fragment.Equals("/"))
-                        {
-                            //Process schema Json
-                            GenerateCodeFromSchema(codeBuilder, jsonValueOfSchema, key, jsonSchemaBuilderIriReference);
-                        }
-                        else if (jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
-                        {
-                            //TODO Avoid serialization step
-                            JsonSerializer jsonSerializer = new JsonSerializer();
-                            JsonSchema jsonSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValueOfSchema);
-                            string afterDefinitions = jsonSchemaBuilderIriReference.Fragment.ToLowerInvariant().Replace("/definitions/", "");
-                            if (jsonSchema.Definitions() != null && jsonSchema.Definitions().TryGetValue(afterDefinitions, out JsonSchema subSchema))
-                            {
-                                //Process subschema Json
-                                GenerateCodeFromSchema(codeBuilder, subSchema.ToJson(jsonSerializer), key, jsonSchemaBuilderIriReference);
-                            }
-                            else
-                            {
-                                throw new CodeGenerationException($"Could not find {afterDefinitions} in the definitions of the schema");
-                            }
-                        }
-                        else
-                        {
-                            throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
-                        }
-                    }
+                {
+                    throw new CodeGenerationException($"LookupReferencedPart failed. Might be because Uri reference is not supported other than /definitions/ or entire schema");
                 }
             }
             catch (CodeGenerationException)
@@ -862,8 +826,6 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             }
         }
 
-
-
         #endregion
 
         #region HelperFunctions
@@ -875,7 +837,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         /// <returns></returns>
         private string TransformToCamelCase(string stringToTransform)
         {
-            return stringToTransform.Substring(0, 1).ToLowerInvariant() + stringToTransform.Substring(1);
+            return _codeGenerator.TransformToCamelCase(stringToTransform);
         }
 
         /// <summary>
@@ -885,7 +847,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
         /// <returns></returns>
         private string TransformToTitleCase(string stringToTransform)
         {
-            return stringToTransform.Substring(0, 1).ToUpperInvariant() + stringToTransform.Substring(1);
+            return _codeGenerator.TransformToTitleCase(stringToTransform);
         }
 
         /// <summary>
