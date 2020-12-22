@@ -48,12 +48,12 @@ namespace DevelApp.JsonSchemaBuilder
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        (string fileName, string code) GenerateCode(Code code, string applicationRoot);
+        (string fileName, string code) GenerateCode(Code code, string applicationRoot, string jsonSchemaApplicationRoot);
 
         /// <summary>
         /// Generate code to a path
         /// </summary>
         /// <param name="code"></param>
-        void GenerateCodeToFile(Code code, string applicationRoot);
+        void GenerateCodeToFile(Code code, string applicationRoot, string jsonSchemaApplicationRoot);
     }
 }
