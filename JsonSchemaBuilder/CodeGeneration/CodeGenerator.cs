@@ -1,6 +1,9 @@
 ﻿using DevelApp.JsonSchemaBuilder.Exceptions;
 using DevelApp.JsonSchemaBuilder.JsonSchemaParts;
 using DevelApp.Utility.Model;
+using Manatee.Json;
+using Manatee.Json.Schema;
+using Manatee.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -61,7 +64,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         private void DoReferenceResolution(IJSBPart jsonSchemaBuilderPart, NamespaceString module)
         {
-            switch(jsonSchemaBuilderPart.PartType)
+            switch (jsonSchemaBuilderPart.PartType)
             {
                 case JSBPartType.IriReference:
                     JSBRef jsonSchemaBuilderIriReference = jsonSchemaBuilderPart as JSBRef;
@@ -75,7 +78,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
                         string localFile = Path.Combine(ApplicationRoot, relativeLocalFileWithExpandedDot);
                         string uriWithoutFragmentString = jsonSchemaBuilderIriReference.IriReference.OriginalString;
-                        if(!string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment))
+                        if (!string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment))
                         {
                             uriWithoutFragmentString = uriWithoutFragmentString.Replace("#" + jsonSchemaBuilderIriReference.Fragment, "");
                         }
@@ -109,7 +112,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                                 {
                                     throw new CodeGenerationException($"Iri reference {uriWithoutFragment} was not found locally at {localFile}");
                                 }
-                            } 
+                            }
                         }
                     }
                     break;
@@ -126,14 +129,14 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     break;
                 case JSBPartType.Array:
                     JSBArray jsonSchemaBuilderArray = jsonSchemaBuilderPart as JSBArray;
-                    foreach(IJSBPart part in jsonSchemaBuilderArray.Items)
+                    foreach (IJSBPart part in jsonSchemaBuilderArray.Items)
                     {
                         DoReferenceResolution(part, module);
                     }
                     break;
                 case JSBPartType.Object:
                     JSBObject jsonSchemaBuilderObject = jsonSchemaBuilderPart as JSBObject;
-                    foreach(IJSBPart property in jsonSchemaBuilderObject.Properties.Values)
+                    foreach (IJSBPart property in jsonSchemaBuilderObject.Properties.Values)
                     {
                         DoReferenceResolution(property, module);
                     }
@@ -181,5 +184,119 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 }
             }
         }
+
+        /// <summary>
+        /// Returns null if not found
+        /// </summary>
+        /// <param name="relativeFileNameWithExpandedDot"></param>
+        /// <param name="jSBRef"></param>
+        /// <returns></returns>
+        public (IJSBPart refPart, JsonValue schemaValue) LookupReferencedPart(string relativeFileNameWithExpandedDot, JSBRef jSBRef)
+        {
+            if (RegisteredJsonSchemas.TryGetValue(relativeFileNameWithExpandedDot, out IJsonSchemaDefinition jsonSchemaDefinition))
+            {
+                if (jSBRef.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
+                {
+                    string definitionKey = TransformToTitleCase(jSBRef.Fragment.Substring("/definitions/".Length));
+                    if (jsonSchemaDefinition.JsonSchemaBuilderSchema.Definitions.TryGetValue(definitionKey, out IJSBPart referencedPart))
+                    {
+                        return (referencedPart, null);
+                    }
+                }
+                else
+                {
+                    return (jsonSchemaDefinition.JsonSchemaBuilderSchema, null);
+                }
+            }
+
+            //Search for the schema file as .schema.json and .json and load it when found
+            string schemaString = string.Empty;
+
+            string localfile = Path.Combine(ApplicationRoot, relativeFileNameWithExpandedDot);
+            if (File.Exists(localfile))
+            {
+                schemaString = File.ReadAllText(localfile);
+            }
+            else
+            {
+                throw new CodeGenerationException($"Schema could not be found at the path {localfile}");
+            }
+
+            // make a schema and generate code from that
+            JsonValue jsonValueOfSchema = JsonValue.Parse(schemaString);
+            if (string.IsNullOrWhiteSpace(jSBRef.Fragment) ||
+                jSBRef.Fragment.Equals("/"))
+            {
+                return (null, jsonValueOfSchema);
+            }
+            else if (jSBRef.Fragment.ToLowerInvariant().StartsWith("/definitions/"))
+            {
+                //TODO Avoid serialization step
+                JsonSerializer jsonSerializer = new JsonSerializer();
+                JsonSchema jsonSchema = jsonSerializer.Deserialize<JsonSchema>(jsonValueOfSchema);
+                string afterDefinitions = jSBRef.Fragment.ToLowerInvariant().Replace("/definitions/", "");
+                if (jsonSchema.Definitions() != null && jsonSchema.Definitions().TryGetValue(afterDefinitions, out JsonSchema subSchema))
+                {
+                    //Process subschema Json
+                    return (null, subSchema.ToJson(jsonSerializer));
+                }
+                else
+                {
+                    throw new CodeGenerationException($"Could not find {afterDefinitions} in the definitions of the schema");
+                }
+            }
+            else
+            {
+                throw new NotImplementedException($"Uri reference is not supported other than /definitions/ or entire schema");
+            }
+        }
+
+        /// <summary>
+        /// Transform string from TitleCase to camelCase. Ignores everything before \ or / if existing
+        /// </summary>
+        /// <param name="stringToTransform"></param>
+        /// <returns></returns>
+        public string TransformToCamelCase(string stringToTransform)
+        {
+            if(string.IsNullOrWhiteSpace(stringToTransform))
+            {
+                return stringToTransform;
+            }
+            int index = stringToTransform.LastIndexOfAny(new char[] { '\\', '/' });
+
+            if (index >= 0 && stringToTransform.Length > index+2)
+            {
+                return stringToTransform.Substring(0, index + 1) + stringToTransform.Substring(index + 1, 1).ToLowerInvariant() + stringToTransform.Substring(index + 2);
+            }
+            else
+            {
+                return stringToTransform.Substring(0, 1).ToLowerInvariant() + stringToTransform.Substring(1);
+            }
+        }
+
+        /// <summary>
+        /// Transform string from camelCase to TitleCase. Ignores everything before \ or / if existing
+        /// </summary>
+        /// <param name="stringToTransform"></param>
+        /// <returns></returns>
+        public string TransformToTitleCase(string stringToTransform)
+        {
+            if (string.IsNullOrWhiteSpace(stringToTransform))
+            {
+                return stringToTransform;
+            }
+            int index = stringToTransform.LastIndexOfAny(new char[] { '\\', '/' });
+
+            if (index >= 0 && stringToTransform.Length > index + 2)
+            {
+                return stringToTransform.Substring(0, index + 1) + stringToTransform.Substring(index + 1, 1).ToUpperInvariant() + stringToTransform.Substring(index + 2);
+            }
+            else
+            {
+                return stringToTransform.Substring(0, 1).ToUpperInvariant() + stringToTransform.Substring(1);
+            }
+        }
+
+
     }
 }
