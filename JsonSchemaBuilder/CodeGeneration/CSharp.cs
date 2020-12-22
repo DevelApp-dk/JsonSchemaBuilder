@@ -111,7 +111,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .L("}");
         }
 
-        private void GenerateCodeForBuilderPart(CodeBuilder codeBuilder, IdentifierString key, IJSBPart value, Dictionary<string, IJSBPart> definitions = null, bool parentIsArray = false)
+        private void GenerateCodeForBuilderPart(CodeBuilder codeBuilder, IdentifierString key, IJSBPart value, Dictionary<string, IJSBPart> definitions = null, bool parentIsArray = false, bool isDefinition = false)
         {
             switch (value.PartType)
             {
@@ -148,7 +148,10 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     else
                     {
-                        GenerateOrdinaryDate(codeBuilder, key, jsonSchemaBuilderDate);
+                        if (!parentIsArray)
+                        {
+                            GenerateOrdinaryDate(codeBuilder, key, jsonSchemaBuilderDate);
+                        }
                     }
                     break;
                 case JSBPartType.DateTime:
@@ -219,7 +222,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     JSBString jsonSchemaBuilderString = value as JSBString;
                     if (jsonSchemaBuilderString.Enums != null && jsonSchemaBuilderString.Enums.Count > 0)
                     {
-                        GenerateEnumString(codeBuilder, key, jsonSchemaBuilderString);
+                        GenerateEnumString(codeBuilder, key, jsonSchemaBuilderString, isDefinition);
                     }
                     else
                     {
@@ -238,9 +241,12 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                     }
                     break;
                 case JSBPartType.IriReference:
-                    JSBRef jsonSchemaBuilderUriReference = value as JSBRef;
                     //Reference cannot be an enum
-                    GenerateOrdinaryUriReference(codeBuilder, key, jsonSchemaBuilderUriReference);
+                    if (!parentIsArray)
+                    {
+                        JSBRef jsonSchemaBuilderUriReference = value as JSBRef;
+                        GenerateOrdinaryUriReference(codeBuilder, key, jsonSchemaBuilderUriReference);
+                    }
                     break;
                 default:
                     codeBuilder.L($"throw new NotImplementedException(\"PartType {value.PartType} is not implemented\");");
@@ -488,7 +494,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             throw new NotImplementedException("Enum on objects has not been implemented");
         }
 
-        private void GenerateOrdinaryObject(CodeBuilder codeBuilder, IdentifierString key, JSBObject jsonSchemaBuilderObject, Dictionary<string, IJSBPart> definitions, bool parentIsArray)
+        private void GenerateOrdinaryObject(CodeBuilder codeBuilder, IdentifierString key, JSBObject jsonSchemaBuilderObject, Dictionary<string, IJSBPart> definitions, bool parentIsArray, bool isDefinition = false)
         {
             GenerateComments(codeBuilder, key, jsonSchemaBuilderObject);
 
@@ -502,7 +508,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             {
                 foreach (KeyValuePair<string, IJSBPart> pair in definitions)
                 {
-                    GenerateCodeForBuilderPart(codeBuilder, pair.Key, pair.Value);
+                    GenerateCodeForBuilderPart(codeBuilder, pair.Key, pair.Value, isDefinition: true);
                     codeBuilder.EmptyLine();
                 }
             }
@@ -534,7 +540,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
 
         #region Generate String
 
-        private void GenerateEnumString(CodeBuilder codeBuilder, IdentifierString key, JSBString jsonSchemaBuilderString)
+        private void GenerateEnumString(CodeBuilder codeBuilder, IdentifierString key, JSBString jsonSchemaBuilderString, bool isDefinition)
         {
             codeBuilder
                 .L($"public enum {TransformToTitleCase(key)}Enum")
@@ -551,11 +557,14 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                 .IndentDecrease()
                 .L("}")
                 .EmptyLine();
-            GenerateComments(codeBuilder, key, jsonSchemaBuilderString);
-            codeBuilder
-                .L($"[JsonProperty(\"{TransformToCamelCase(key)}\"), JsonConverter(typeof(StringEnumConverter))]") 
-                .L($"public {TransformToTitleCase(key)}Enum {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderString)}")
-                .EmptyLine();
+            if (!isDefinition)
+            {
+                GenerateComments(codeBuilder, key, jsonSchemaBuilderString);
+                codeBuilder
+                    .L($"[JsonProperty(\"{TransformToCamelCase(key)}\"), JsonConverter(typeof(StringEnumConverter))]")
+                    .L($"public {TransformToTitleCase(key)}Enum {TransformToTitleCase(key)} {{ get; set; }}{GenerateDefaultIfExisting(key, jsonSchemaBuilderString)}")
+                    .EmptyLine();
+            }
         }
 
         private void GenerateOrdinaryString(CodeBuilder codeBuilder, IdentifierString key, JSBString jsonSchemaBuilderString)

@@ -18,10 +18,10 @@ namespace JsonSchemaBuilder.Test
             string pathString = ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar;
             string assemblyPath = GetType().Assembly.Location;
             string pathStringExpanded = Path.GetFullPath(pathString, assemblyPath);
-
-            LoadAllJsonSchemaBuildersAndWriteSchemasToFile(pathStringExpanded);
-
-            LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(pathStringExpanded, pathStringExpanded);
+            string jsonSchemaApplicationRoot = Path.Combine(pathStringExpanded, "JsonSchema");
+            LoadAllJsonSchemaBuildersAndWriteSchemasToFile(jsonSchemaApplicationRoot);
+            string applicationRoot = Path.Combine(pathStringExpanded, "CSharp");
+            LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(applicationRoot, jsonSchemaApplicationRoot);
         }
 
 
@@ -29,21 +29,29 @@ namespace JsonSchemaBuilder.Test
 
         private static void LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(string applicationRoot, string jsonSchemaApplicationRoot)
         {
+            if (Directory.Exists(applicationRoot))
+            {
+                Directory.Delete(applicationRoot, true);
+            }
             CodeGenerator codeGenerator = new CodeGenerator(applicationRoot, jsonSchemaApplicationRoot);
             foreach (Type codeDefinedType in GetInterfaceTypes(typeof(IJsonSchemaDefinition)))
             {
                 IJsonSchemaDefinition jsonSchema = GetJsonSchemaInstance(codeDefinedType);
                 codeGenerator.Register(jsonSchema);
             }
-            codeGenerator.Generate(Code.CSharp);
+            codeGenerator.GenerateToFile(Code.CSharp);
         }
 
-        private static void LoadAllJsonSchemaBuildersAndWriteSchemasToFile(string pathString)
+        private static void LoadAllJsonSchemaBuildersAndWriteSchemasToFile(string jsonSchemaApplicationRoot)
         {
+            if (Directory.Exists(jsonSchemaApplicationRoot))
+            {
+                Directory.Delete(jsonSchemaApplicationRoot, true);
+            }
             foreach (Type codeDefinedType in GetInterfaceTypes(typeof(IJsonSchemaDefinition)))
             {
                 IJsonSchemaDefinition jsonSchema = GetJsonSchemaInstance(codeDefinedType);
-                jsonSchema.WriteSchemaToFile(pathString);
+                jsonSchema.WriteSchemaToFile(jsonSchemaApplicationRoot);
             }
         }
 
@@ -463,6 +471,42 @@ namespace JsonSchemaBuilder.Test
             JSBArray arrayPart = new JSBArray("MyTopPartArray", "TopPart", items);
 
             return new JSBSchema("ArrayAsATopPart", Description, topPart: arrayPart);
+        }
+    }
+
+    public class ArrayAsTopPartRefChildJsonSchema : AbstractJsonSchema
+    {
+        public override NamespaceString Module
+        {
+            get
+            {
+                return "Funny.Onion";
+            }
+        }
+
+        public override string Description
+        {
+            get
+            {
+                return "Used to test array as a top part";
+            }
+        }
+
+        protected override JSBSchema BuildJsonSchema()
+        {
+            List<IJSBPart> items = new List<IJSBPart>();
+            if (Uri.TryCreate("./dateAsTopPart", UriKind.RelativeOrAbsolute, out Uri uri))
+            {
+                items.Add(new JSBRef("ArrayUriReference", "Array of UriReference", iriReference: uri));
+
+                JSBArray arrayPart = new JSBArray("MyTopPartArray", "TopPart", items);
+
+                return new JSBSchema("ArrayAsATopPart", Description, topPart: arrayPart);
+            }
+            else
+            {
+                throw new Exception("Uri not valid");
+            }
         }
     }
 
