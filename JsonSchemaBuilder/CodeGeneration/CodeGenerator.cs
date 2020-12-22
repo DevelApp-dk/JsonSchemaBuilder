@@ -76,7 +76,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                             relativeLocalFileWithExpandedDot = Path.Combine(module.ToFilePath, relativeLocalFileWithExpandedDot.Remove(0, 2));
                         }
 
-                        string localFile = Path.Combine(ApplicationRoot, relativeLocalFileWithExpandedDot);
+                        string localFile = Path.Combine(ApplicationRoot, TransformToCamelCase(relativeLocalFileWithExpandedDot));
                         string uriWithoutFragmentString = jsonSchemaBuilderIriReference.IriReference.OriginalString;
                         if (!string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment))
                         {
