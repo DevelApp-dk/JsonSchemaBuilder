@@ -16,12 +16,14 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
     {
         public Dictionary<string, IJsonSchemaDefinition> RegisteredJsonSchemas { get; } = new Dictionary<string, IJsonSchemaDefinition>();
 
-        public CodeGenerator(string applicationRoot)
+        public CodeGenerator(string applicationRoot, string jsonSchemaApplicationRoot)
         {
             ApplicationRoot = applicationRoot;
+            JsonSchemaApplicationRoot = jsonSchemaApplicationRoot;
         }
 
         public string ApplicationRoot { get; }
+        public string JsonSchemaApplicationRoot { get; }
 
         /// <summary>
         /// Generate a list of code to memory and suggest a filename from registered IJsonSchemaDefinitions
@@ -76,7 +78,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
                             relativeLocalFileWithExpandedDot = Path.Combine(module.ToFilePath, relativeLocalFileWithExpandedDot.Remove(0, 2));
                         }
 
-                        string localFile = Path.Combine(ApplicationRoot, TransformToCamelCase(relativeLocalFileWithExpandedDot));
+                        string localFile = Path.Combine(JsonSchemaApplicationRoot, TransformToCamelCase(relativeLocalFileWithExpandedDot));
                         string uriWithoutFragmentString = jsonSchemaBuilderIriReference.IriReference.OriginalString;
                         if (!string.IsNullOrWhiteSpace(jsonSchemaBuilderIriReference.Fragment))
                         {
@@ -212,7 +214,7 @@ namespace DevelApp.JsonSchemaBuilder.CodeGeneration
             //Search for the schema file as .schema.json and .json and load it when found
             string schemaString = string.Empty;
 
-            string localfile = Path.Combine(ApplicationRoot, relativeFileNameWithExpandedDot);
+            string localfile = Path.Combine(JsonSchemaApplicationRoot, relativeFileNameWithExpandedDot);
             if (File.Exists(localfile))
             {
                 schemaString = File.ReadAllText(localfile);
