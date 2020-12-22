@@ -21,15 +21,15 @@ namespace JsonSchemaBuilder.Test
 
             LoadAllJsonSchemaBuildersAndWriteSchemasToFile(pathStringExpanded);
 
-            LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(pathStringExpanded);
+            LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(pathStringExpanded, pathStringExpanded);
         }
 
 
         #region Assembly load all schemas and write
 
-        private static void LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(string pathString)
+        private static void LoadAllJsonSchemaBuildersAndGenerateCSharpCodeToFile(string applicationRoot, string jsonSchemaApplicationRoot)
         {
-            CodeGenerator codeGenerator = new CodeGenerator(pathString);
+            CodeGenerator codeGenerator = new CodeGenerator(applicationRoot, jsonSchemaApplicationRoot);
             foreach (Type codeDefinedType in GetInterfaceTypes(typeof(IJsonSchemaDefinition)))
             {
                 IJsonSchemaDefinition jsonSchema = GetJsonSchemaInstance(codeDefinedType);

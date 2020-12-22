@@ -96,9 +96,9 @@ namespace DevelApp.JsonSchemaBuilder
             }
         }
 
-        private CodeGenerator CodeGeneration(string applicationRoot)
+        private CodeGenerator CodeGeneration(string applicationRoot, string jsonSchemaApplicationRoot)
         {
-            CodeGenerator codeGenerator = new CodeGenerator(applicationRoot);
+            CodeGenerator codeGenerator = new CodeGenerator(applicationRoot, jsonSchemaApplicationRoot);
             codeGenerator.Register(this);
             return codeGenerator;
         }
@@ -109,9 +109,9 @@ namespace DevelApp.JsonSchemaBuilder
         /// <param name="code"></param>
         /// <param name="applicationRoot"></param>
         /// <returns></returns>
-        public (string fileName, string code) GenerateCode(Code code, string applicationRoot)
+        public (string fileName, string code) GenerateCode(Code code, string applicationRoot, string jsonSchemaApplicationRoot)
         {
-            return CodeGeneration(applicationRoot).Generate(code).FirstOrDefault();
+            return CodeGeneration(applicationRoot, jsonSchemaApplicationRoot).Generate(code).FirstOrDefault();
         }
 
         /// <summary>
@@ -119,9 +119,9 @@ namespace DevelApp.JsonSchemaBuilder
         /// </summary>
         /// <param name="code"></param>
         /// <param name="applicationRoot"></param>
-        public void GenerateCodeToFile(Code code, string applicationRoot)
+        public void GenerateCodeToFile(Code code, string applicationRoot, string jsonSchemaApplicationRoot)
         {
-            CodeGeneration(applicationRoot).GenerateToFile(code);
+            CodeGeneration(applicationRoot, jsonSchemaApplicationRoot).GenerateToFile(code);
         }
 
         public string FileName
