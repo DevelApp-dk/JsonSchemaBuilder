@@ -21,7 +21,7 @@ namespace DevelApp.JsonSchemaBuilder
         {
             get
             {
-                return "DevelApp.Module.Default";
+                return "Default";
             }
         }
 
